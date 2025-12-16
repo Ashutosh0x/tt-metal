@@ -130,7 +130,6 @@ ttnn::operations::experimental::ccl::strided_all_gather_minimal_matmul_async::St
                 topology,
                 multi_device_global_semaphore,
                 cluster_axis,
-                /*tiles_per_chunk=*/std::nullopt,
                 num_workers_per_link,
                 num_buffers_per_channel,
                 config->compute_with_storage_grid_size.y,
