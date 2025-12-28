@@ -6,10 +6,13 @@
 
 #include "ttnn-nanobind/decorators.hpp"
 #include "sliding_window.hpp"
+#include "op_slicing/op_slicing.hpp"
 
 using namespace tt::tt_metal;
 
 namespace ttnn::operations::sliding_window {
+
+using namespace op_slicing;
 
 void bind_sliding_window(nb::module_& mod) {
     nb::class_<ParallelConfig>(mod, "ParallelConfig")
@@ -22,6 +25,45 @@ void bind_sliding_window(nb::module_& mod) {
         .def_rw("grid", &ParallelConfig::grid)
         .def_rw("shard_scheme", &ParallelConfig::shard_scheme)
         .def_rw("shard_orientation", &ParallelConfig::shard_orientation);
+
+    auto py_op2d_slice_config = nb::class_<Op2dSliceConfig>(
+        mod,
+        "Op2dSliceConfig",
+        R"doc(
+        | Op2dSliceConfig is a structure that is used to configure how the input & output tensors of Conv2D are sliced when they are placed in DRAM. \
+        | Conv2D only supports inputs in L1. If the input tensor or output tensor are too large to fit into L1, then the Conv2d_DRAM version can be used. \
+        | It slices the input & output into slices and applies the Conv2D op on each slice. \
+        | Op2dSliceConfig determines how this slicing happens.
+        )doc");
+
+    py_op2d_slice_config.def(
+        nb::init<Op2dSliceConfig::SliceType, uint32_t>(), nb::kw_only(), nb::arg("slice_type"), nb::arg("num_slices"));
+
+    py_op2d_slice_config.def(nb::init<Op2dSliceConfig::SliceType>(), nb::kw_only(), nb::arg("slice_type"));
+    py_op2d_slice_config.def("__repr__", [](const Op2dSliceConfig& config) { return fmt::format("{}", config); });
+    py_op2d_slice_config.def_rw(
+        "slice_type",
+        &Op2dSliceConfig::slice_type,
+        R"doc(
+        | The type of slice to be used. Can be either SliceHeight or SliceWidth. When the tensor is in [N, H, W, C] format, then it can slice either along the height or width dimension.
+        | Slicing along the width is preferable as it reduces the size of the output of the Halo operation.
+        | Use SliceHeight only when the height dimension is much larger than the width dimension.
+        )doc");
+
+    py_op2d_slice_config.def_rw(
+        "num_slices",
+        &Op2dSliceConfig::num_slices,
+        R"doc(
+        | The number of slices that the input & output tensors are divided into.
+        | The output tensor is divided into num_slices slices along the slice_type dimension.
+        | The corresponding input tensor needed to calculate that output is determined and sliced.
+        | If the size of the slice dimension is not divisible by num_slices, then the last slice will be smaller than the rest.
+        )doc");
+
+    nb::enum_<Op2dSliceConfig::SliceType>(py_op2d_slice_config, "SliceTypeEnum")
+        .value("L1Full", Op2dSliceConfig::SliceType::L1_FULL)
+        .value("DRAMSliceHeight", Op2dSliceConfig::SliceType::DRAM_HEIGHT)
+        .value("DRAMSliceWidth", Op2dSliceConfig::SliceType::DRAM_WIDTH);
 }
 
 }  // namespace ttnn::operations::sliding_window
