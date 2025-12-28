@@ -250,19 +250,23 @@ ALWI void read_kernel_with_top_left_index(uint32_t ind, uint32_t in_l1_read_base
         }
         for (uint32_t h = 0; h < kernel_h; ++h) {
             auto process_h = [&](uint32_t w_offset, uint32_t w_multiple) __attribute__((always_inline)) {
-                const uint32_t stick_offset = ind + w_offset + h * dilation_h * in_w_padded;
-                const uint32_t read_offset =
-                    in_l1_read_base_addr + (stick_offset * shard_width_bytes + c_i * MAX_BYTES_PER_REDUCTION);
-                noc_async_read_one_packet(get_noc_addr(read_offset), in_l1_write_addr, read_bytes * w_multiple);
-                in_l1_write_addr += max_write_inc * w_multiple;
+                if constexpr (reader_id == 0) {
+                    const uint32_t stick_offset = ind + w_offset + h * dilation_h * in_w_padded;
+                    const uint32_t read_offset =
+                        in_l1_read_base_addr + (stick_offset * shard_width_bytes + c_i * MAX_BYTES_PER_REDUCTION);
+                    noc_async_read_one_packet(get_noc_addr(read_offset), in_l1_write_addr, read_bytes * w_multiple);
+                    in_l1_write_addr += max_write_inc * w_multiple;
+                }
                 processed_sticks += w_multiple;
                 if ((is_large_kernel && (processed_sticks % sticks_per_chunk == 0)) ||
                     processed_sticks == total_elems_to_reduce) {
                     if constexpr (reader_id == 0) {  // push a chunk
                         noc_async_read_barrier();
                         cb_push_back(in_cb_id, 1);
-                        cb_reserve_back(in_cb_id, 1);
-                        in_l1_write_addr = get_write_ptr(in_cb_id);
+                        if (!(processed_sticks == total_elems_to_reduce)) {
+                            cb_reserve_back(in_cb_id, 1);
+                            in_l1_write_addr = get_write_ptr(in_cb_id);
+                        }
                     } else {
                         if (processed_sticks == total_elems_to_reduce) {  // write output once all chunks are done
                             constexpr uint32_t num_faces_in_output_tile = 2;
@@ -270,6 +274,9 @@ ALWI void read_kernel_with_top_left_index(uint32_t ind, uint32_t in_l1_read_base
                                 last_tile_is_partial && in_c % TILE_WIDTH <= FACE_WIDTH ? 1 : 2;
                             uint32_t output_faces =
                                 c_i == in_nblocks_c - 1 ? num_faces_in_last_output_tile : num_faces_in_output_tile;
+
+                            cb_reserve_back(out_cb_id, output_faces);
+                            cb_reserve_back(out_idx_cb_id, output_faces);
 
                             cb_wait_front(pack_tmp_cb_id, 1);
                             noc_async_read_one_packet(
@@ -420,15 +427,8 @@ void kernel_main() {
     if constexpr (need_to_initialize_in_cb) {
         if constexpr (reader_id == 0) {
             fill_with_val(get_write_ptr(clear_value_cb_id), TILE_HEIGHT * TILE_WIDTH, bf16_init_value);
-            cb_push_back(clear_value_cb_id, 1);
+            clear_out_tiles<in_cb_id, clear_value_cb_id>();
         }
-        if constexpr (reader_id == 1) {
-            cb_wait_front(clear_value_cb_id, 1);
-        }
-        // for average pool clear out tiles runs in loop, no need to initialize here
-        // TODO do we really need to init the in CB for return indices?
-        // - yes until LLK is updated for arbitrary kernel sizes, for now we rely on init
-        clear_out_tiles<in_cb_id, clear_value_cb_id>();
     }
 
     if constexpr (reader_id == 0) {

@@ -259,10 +259,15 @@ void MAIN {
             pack_tile<true>(index_scratch_out_dst_idx, pack_idx_tmp_cb_id, mpwi_cb_tile_idx);  // for reader
             cb_push_back(pack_idx_tmp_cb_id, 1);
 
-            cb_reserve_back(compute_tmp_idx_cb_id, 1);
-            pack_reconfig_data_format(compute_tmp_idx_cb_id);
-            pack_tile<true>(index_scratch_out_dst_idx, compute_tmp_idx_cb_id, mpwi_cb_tile_idx);  // for compute
-            cb_push_back(compute_tmp_idx_cb_id, 1);
+            // Only push to compute_tmp_idx_cb_id if there's a next iteration that will consume it
+            // This prevents leaving stale data in the CB between program runs when using caching
+            bool is_last_iteration = (n == num_out_sticks_this_core - 1) && last_c_block;
+            if (!is_last_iteration) {
+                cb_reserve_back(compute_tmp_idx_cb_id, 1);
+                pack_reconfig_data_format(compute_tmp_idx_cb_id);
+                pack_tile<true>(index_scratch_out_dst_idx, compute_tmp_idx_cb_id, mpwi_cb_tile_idx);  // for compute
+                cb_push_back(compute_tmp_idx_cb_id, 1);
+            }
 
             tile_regs_release();
         }

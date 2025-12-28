@@ -494,7 +494,7 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
                 params.index_nbytes * tile_elems,
                 1);
 
-            uint32_t compute_tmp_idx_cb_id = next_cb_index++;
+            compute_tmp_idx_cb_id = next_cb_index++;
             tt::tt_metal::create_cb(
                 compute_tmp_idx_cb_id, program, all_cores, params.index_nbytes * tile_elems, 1, params.index_format);
             log_debug(
@@ -917,6 +917,9 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
          .right_inc_cb = right_inc_cb_id,
          .down_left_wrap_inc_cb = down_left_wrap_inc_cb_id,
          .up_left_wrap_inc_cb = up_left_wrap_inc_cb_id,
+         .intra_kernel_right_inc_cb = intra_kernel_right_inc_cb_id,
+         .intra_kernel_down_left_wrap_inc_cb = intra_kernel_down_left_wrap_inc_cb_id,
+         .compute_tmp_idx_cb = compute_tmp_idx_cb_id,
          .ncores = ncores,
          .reader_indices_storage = reader_indices_storage,
          .scalar_config_storage = scalar_config_storage}};
