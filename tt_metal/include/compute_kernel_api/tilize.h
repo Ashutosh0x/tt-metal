@@ -5,7 +5,7 @@
 #pragma once
 
 #include "compute_kernel_api/common.h"
-#include "compute_kernel_api/state_tracker.h"
+#include "compute_kernel_api/sentinel/compute_kernel_sentinel.h"
 #ifdef TRISC_MATH
 #include "llk_math_unary_datacopy_api.h"
 #include "llk_math_reduce_api.h"
@@ -31,8 +31,8 @@ namespace ckernel {
  * | Function   | ocb    | Output circular buffer identifier             | uint32_t | 0 to 31     | True     |
  */
 // clang-format on
-ALWI void tilize_init(uint32_t icb, uint32_t block, uint32_t ocb) {
-    PACK((state_configure<Operand::SRCA, Operand::PACK>(icb, ocb)));
+ALWI void tilize_init(uint32_t icb, uint32_t block, uint32_t ocb, uint32_t call_line = __builtin_LINE()) {
+    PACK((state_configure<Operand::SRCA, Operand::PACK>(icb, ocb, call_line)));
     UNPACK((llk_unpack_tilize_init(icb, block)));
     MATH((llk_math_eltwise_unary_datacopy_init<
           A2D,
@@ -60,8 +60,8 @@ ALWI void tilize_init(uint32_t icb, uint32_t block, uint32_t ocb) {
  * | Function   | block  | Size of tile block to work on                 | uint32_t | > 0         | True     |
  */
 // clang-format on
-ALWI void tilize_init_no_pack(uint32_t icb, uint32_t block) {
-    PACK(state_configure(icb));
+ALWI void tilize_init_no_pack(uint32_t icb, uint32_t block, uint32_t call_line = __builtin_LINE()) {
+    PACK(state_configure(icb, call_line));
     UNPACK((llk_unpack_tilize_init(icb, block)));
     MATH((llk_math_eltwise_unary_datacopy_init<
           A2D,
@@ -98,9 +98,10 @@ ALWI void tilizeA_B_reduce_init(
     uint32_t block,
     uint32_t ocb,
     uint32_t num_faces = 4,
-    uint32_t face_r_dim = 16) {
+    uint32_t face_r_dim = 16,
+    uint32_t call_line = __builtin_LINE()) {
     // TODO(issue #34432): Wrapping state_configure inside PACK will serve as a workaround but it need investigation
-    PACK(state_configure(icb0, icb1_scaler, ocb));
+    PACK(state_configure(icb0, icb1_scaler, ocb, call_line));
     UNPACK((llk_unpack_hw_configure<DST_ACCUM_MODE>(icb0, icb1_scaler)));
     UNPACK((llk_unpack_tilizeA_B_init<neginf_srcA, true, false, zero_srcA_reduce>(
         icb0, icb1_scaler, block, num_faces, face_r_dim, 1)));
@@ -378,11 +379,11 @@ ALWI void tilize_uninit_with_dt_no_pack(uint32_t old_icb, uint32_t new_icb) {
     MATH((llk_math_reconfig_data_format_srca<DST_ACCUM_MODE>(old_icb, new_icb)));
 }
 
-ALWI void fast_tilize_init(uint32_t icb, uint32_t full_dim, uint32_t ocb) {
-    PACK((state_configure<Operand::SRCA, Operand::PACK>(icb, ocb)));
+ALWI void fast_tilize_init(uint32_t icb, uint32_t full_dim, uint32_t ocb, uint32_t call_line = __builtin_LINE()) {
+    PACK((state_configure<Operand::SRCA, Operand::PACK>(icb, ocb, call_line)));
 #ifdef ARCH_BLACKHOLE
     // Blackhole fallback
-    tilize_init(icb, full_dim, ocb);
+    tilize_init(icb, full_dim, ocb, call_line);
 #else
     UNPACK((llk_unpack_fast_tilize_init(icb, full_dim)));
     MATH((llk_math_fast_tilize_init(icb, full_dim == 1 ? 1 : 2)));

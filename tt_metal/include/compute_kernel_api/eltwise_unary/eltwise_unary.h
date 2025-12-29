@@ -5,7 +5,7 @@
 #pragma once
 
 #include "compute_kernel_api/common.h"
-#include "compute_kernel_api/state_tracker.h"
+#include "compute_kernel_api/sentinel/compute_kernel_sentinel.h"
 #ifdef TRISC_MATH
 #include "llk_math_unary_datacopy_api.h"
 #endif
@@ -15,9 +15,9 @@
 
 namespace ckernel {
 
-ALWI void unary_op_init_common(uint32_t icb, uint32_t ocb) {
+ALWI void unary_op_init_common(uint32_t icb, uint32_t ocb, uint32_t call_line = __builtin_LINE()) {
     // TODO(issue #34432): Wrapping state_configure inside PACK will serve as a workaround but it need investigation
-    PACK((state_configure<Operand::SRCA, Operand::PACK>(icb, ocb)));
+    PACK((state_configure<Operand::SRCA, Operand::PACK>(icb, ocb, call_line)));
 
     UNPACK((llk_unpack_hw_configure<DST_ACCUM_MODE, true>(icb)));
     UNPACK((llk_unpack_A_init<BroadcastType::NONE, false, EltwiseBinaryReuseDestType::NONE, UnpackToDestEn>(
@@ -39,8 +39,8 @@ ALWI void unary_op_init_common(uint32_t icb, uint32_t ocb) {
  * Note: This function does not configure PACK thread, use with caution.
  */
 // clang-format on
-ALWI void unary_op_init_common_no_pack(uint32_t icb) {
-    PACK(state_configure(icb));
+ALWI void unary_op_init_common_no_pack(uint32_t icb, uint32_t call_line = __builtin_LINE()) {
+    PACK(state_configure(icb, call_line));
     UNPACK((llk_unpack_hw_configure<DST_ACCUM_MODE, true>(icb)));
     UNPACK((llk_unpack_A_init<BroadcastType::NONE, false, EltwiseBinaryReuseDestType::NONE, UnpackToDestEn>(
         false /*transpose of faces*/, false /*transpose within 16x16 face*/, icb)));
@@ -49,6 +49,8 @@ ALWI void unary_op_init_common_no_pack(uint32_t icb) {
     MATH((llk_math_hw_configure(icb, icb)));
 }
 
-ALWI void init_sfpu(uint32_t icb, uint32_t ocb) { unary_op_init_common(icb, ocb); }
+ALWI void init_sfpu(uint32_t icb, uint32_t ocb, uint32_t call_line = __builtin_LINE()) {
+    unary_op_init_common(icb, ocb, call_line);
+}
 
 }  // namespace ckernel
