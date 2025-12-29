@@ -457,6 +457,11 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
             up_left_wrap_inc_cb_id, program, all_cores, params.index_nbytes * tile_elems, 1, params.index_format);
         log_debug(tt::LogOp, "CB {} :: PS = {}, NP = {}", up_left_wrap_inc_cb_id, params.index_nbytes * tile_elems, 1);
 
+        compute_tmp_idx_cb_id = next_cb_index++;
+        tt::tt_metal::create_cb(
+            compute_tmp_idx_cb_id, program, all_cores, params.index_nbytes * tile_elems, 1, params.index_format);
+        log_debug(tt::LogOp, "CB {} :: PS = {}, NP = {}", compute_tmp_idx_cb_id, params.index_nbytes * tile_elems, 1);
+
         // compute increments for index tile population
         right_inc = stride_w;
         down_left_wrap_inc = in_w * stride_h + (1 - out_w) * stride_w;
@@ -493,12 +498,6 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
                 intra_kernel_down_left_wrap_inc_cb_id,
                 params.index_nbytes * tile_elems,
                 1);
-
-            compute_tmp_idx_cb_id = next_cb_index++;
-            tt::tt_metal::create_cb(
-                compute_tmp_idx_cb_id, program, all_cores, params.index_nbytes * tile_elems, 1, params.index_format);
-            log_debug(
-                tt::LogOp, "CB {} :: PS = {}, NP = {}", compute_tmp_idx_cb_id, params.index_nbytes * tile_elems, 1);
 
             // for large kernels we process row by row since inc's aren't consistent if we just process 32 stick batches
             // this means we process multiple top left positions within the kernel for a single top left position in the

@@ -124,7 +124,6 @@ void MAIN {
     }
 
     unary_op_init_common(in_cb_id_0, in_cb_id_0);
-    copy_tile_to_dst_init_short(in_cb_id_0);
     max_reduce_with_indices_init<ckernel::DataLayout::ROW_MAJOR>();
 
     // if max out sticks is non-zero then this will be used as the number of out sticks for every core
@@ -147,6 +146,7 @@ void MAIN {
             uint32_t intra_kernel_w = 0;
             if (first_iteration) {
                 cb_wait_front(in_idx_cb_id, 1);
+                copy_tile_to_dst_init_short(in_idx_cb_id);
                 reconfig_data_format_srca(in_idx_cb_id);
                 copy_tile(
                     in_idx_cb_id, mpwi_cb_tile_idx, index_dst_idx);  // move the initial indexes from the reader to DST
@@ -154,6 +154,7 @@ void MAIN {
                 first_iteration = false;
             } else {
                 cb_wait_front(compute_tmp_idx_cb_id, 1);
+                copy_tile_to_dst_init_short(compute_tmp_idx_cb_id);
                 reconfig_data_format_srca(compute_tmp_idx_cb_id);
                 copy_tile(
                     compute_tmp_idx_cb_id,
@@ -169,10 +170,6 @@ void MAIN {
             for (uint32_t chunk = 0; chunk < interm_reduction_chunks; chunk++) {
                 bool first_chunk = chunk == 0;
                 bool last_chunk = chunk == interm_reduction_chunks - 1;
-                cb_wait_front(curr_in_cb_id, 1);
-
-                reconfig_data_format_srca(curr_in_cb_id);
-                copy_tile(curr_in_cb_id, mpwi_cb_tile_idx, data_dst_idx);
 
                 // increments happen between every chunk within a C block, and between C blocks
                 bool increment_needed = false;
@@ -185,16 +182,19 @@ void MAIN {
                         if (current_idx_row + stride_h + eff_kernel_h > in_h_padded) {
                             // we reached the bottom right corner, wrap to the top and to the left
                             current_idx_row = 0;
+                            copy_tile_to_dst_init_short(up_left_wrap_inc_cb_id);
                             reconfig_data_format_srca(up_left_wrap_inc_cb_id);
                             copy_tile(up_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {
                             current_idx_row += stride_h;
+                            copy_tile_to_dst_init_short(down_left_wrap_inc_cb_id);
                             reconfig_data_format_srca(down_left_wrap_inc_cb_id);
                             copy_tile(down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         }
                     } else {
                         // we are still in the same row, move to the right
                         current_idx_col += stride_w;
+                        copy_tile_to_dst_init_short(right_inc_cb_id);
                         reconfig_data_format_srca(right_inc_cb_id);
                         copy_tile(right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                     }
@@ -206,11 +206,13 @@ void MAIN {
                         increment_needed = true;
                         if (intra_kernel_w + sticks_per_chunk < kernel_w) {  // move right in this row
                             intra_kernel_w += sticks_per_chunk;
+                            copy_tile_to_dst_init_short(intra_kernel_right_inc_cb_id);
                             reconfig_data_format_srca(intra_kernel_right_inc_cb_id);
                             copy_tile(intra_kernel_right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {  // move down to the next row
                             intra_kernel_w = 0;
                             intra_kernel_h += 1;
+                            copy_tile_to_dst_init_short(intra_kernel_down_left_wrap_inc_cb_id);
                             reconfig_data_format_srca(intra_kernel_down_left_wrap_inc_cb_id);
                             copy_tile(intra_kernel_down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         }
@@ -223,6 +225,11 @@ void MAIN {
                     add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
                 }
 
+                cb_wait_front(curr_in_cb_id, 1);
+                copy_tile_to_dst_init_short(curr_in_cb_id);
+                reconfig_data_format_srca(curr_in_cb_id);
+                copy_tile(curr_in_cb_id, mpwi_cb_tile_idx, data_dst_idx);
+
                 // the max_reduce_with_indices LLK function only supports kernel_size=9, pending
                 // https://github.com/tenstorrent/tt-metal/issues/28141 but, since for return_indices the in_cb is
                 // oversized (equal to 1 tile), and since this CB is filled with padding values in the beginning of
@@ -230,9 +237,6 @@ void MAIN {
                 // smaller than 9 as the excess sticks are just filled with padding values
                 constexpr uint32_t max_mpwi_kernel_size = window_size_hw <= 9 ? 9 : 32;
                 // TODO update SFPU to do DST accumulation
-
-                dprint_tensix_dest_reg(0);
-
                 max_reduce_with_indices_init<ckernel::DataLayout::ROW_MAJOR>();
                 max_reduce_with_indices<max_mpwi_kernel_size, ckernel::DataLayout::ROW_MAJOR>(
                     data_dst_idx, index_dst_idx);
