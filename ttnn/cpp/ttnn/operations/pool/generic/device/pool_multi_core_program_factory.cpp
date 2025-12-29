@@ -426,6 +426,7 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
     uint32_t intra_kernel_right_inc_cb_id = 32;
     uint32_t intra_kernel_down_left_wrap_inc_cb_id = 32;
     uint32_t compute_tmp_idx_cb_id = 32;
+    uint32_t zero_inc_cb_id = 32;
     uint16_t right_inc = 0;
     uint16_t down_left_wrap_inc = 0;
     uint16_t up_left_wrap_inc = 0;
@@ -461,6 +462,11 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
         tt::tt_metal::create_cb(
             compute_tmp_idx_cb_id, program, all_cores, params.index_nbytes * tile_elems, 1, params.index_format);
         log_debug(tt::LogOp, "CB {} :: PS = {}, NP = {}", compute_tmp_idx_cb_id, params.index_nbytes * tile_elems, 1);
+
+        zero_inc_cb_id = next_cb_index++;
+        tt::tt_metal::create_cb(
+            zero_inc_cb_id, program, all_cores, params.index_nbytes * tile_elems, 1, params.index_format);
+        log_debug(tt::LogOp, "CB {} :: PS = {}, NP = {}", zero_inc_cb_id, params.index_nbytes * tile_elems, 1);
 
         // compute increments for index tile population
         right_inc = stride_w;
@@ -638,56 +644,57 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
             next_cb_index++, program, all_cores, config_buffer_page_size, 1, config_df, &*config_buffer);
     }
     std::vector<uint32_t> reader0_ct_args = {
-        max_out_nhw_per_core,                  // 0
-        kernel_h,                              // 1
-        kernel_w,                              // 2
-        pad_w,                                 // 3
-        in_nbytes_leftover,                    // 4
-        in_w,                                  // 5
-        in_c_per_shard_ceil,                   // 6
-        params.split_reader,                   // enable split reader //7
-        0,                                     // split reader id //8
-        bf16_scalar,                           // 9
-        bf16_init_value,                       // 10
-        in_nblocks_c,                          // 11
-        in_cb_sz,                              // 12
-        params.max_rows_for_reduction,         // 13
-        ceil_pad_w,                            // 14
-        in_cb_id_0,                            // 15
-        in_cb_id_1,                            // 16
-        raw_in_cb_id,                          // 17
-        in_reader_indices_cb_id,               // 18
-        in_scalar_cb_id_0,                     // 19
-        in_scalar_cb_id_1,                     // 20
-        in_idx_cb_id,                          // 21
-        pack_tmp_cb_id,                        // 22
-        pack_idx_tmp_cb_id,                    // 23
-        right_inc_cb_id,                       // 24
-        down_left_wrap_inc_cb_id,              // 25
-        up_left_wrap_inc_cb_id,                // 26
-        clear_value_cb_id,                     // 27
-        (uint32_t)pool_type,                   // 28
-        one_scalar_per_core,                   // 29
-        config_cb_id,                          // 30
-        in_nbytes_c,                           // 31
-        shard_width_bytes,                     // 32
-        params.multi_buffering_factor,         // 33
-        stride_w,                              // 34
-        dilation_h,                            // 35
-        dilation_w,                            // 36
-        (uint32_t)return_indices,              // 37
-        pad_t,                                 // 38
-        pad_l,                                 // 39
-        right_inc,                             // 40
-        down_left_wrap_inc,                    // 41
-        up_left_wrap_inc,                      // 42
-        (uint32_t)zero_pages,                  // 43
-        out_cb_id,                             // 44
-        out_idx_cb_id,                         // 45
-        intra_kernel_right_inc,                // 46
-        intra_kernel_down_left_wrap_inc,       // 47
-        intra_kernel_right_inc_cb_id,          // 48
-        intra_kernel_down_left_wrap_inc_cb_id  // 49
+        max_out_nhw_per_core,                   // 0
+        kernel_h,                               // 1
+        kernel_w,                               // 2
+        pad_w,                                  // 3
+        in_nbytes_leftover,                     // 4
+        in_w,                                   // 5
+        in_c_per_shard_ceil,                    // 6
+        params.split_reader,                    // enable split reader //7
+        0,                                      // split reader id //8
+        bf16_scalar,                            // 9
+        bf16_init_value,                        // 10
+        in_nblocks_c,                           // 11
+        in_cb_sz,                               // 12
+        params.max_rows_for_reduction,          // 13
+        ceil_pad_w,                             // 14
+        in_cb_id_0,                             // 15
+        in_cb_id_1,                             // 16
+        raw_in_cb_id,                           // 17
+        in_reader_indices_cb_id,                // 18
+        in_scalar_cb_id_0,                      // 19
+        in_scalar_cb_id_1,                      // 20
+        in_idx_cb_id,                           // 21
+        pack_tmp_cb_id,                         // 22
+        pack_idx_tmp_cb_id,                     // 23
+        right_inc_cb_id,                        // 24
+        down_left_wrap_inc_cb_id,               // 25
+        up_left_wrap_inc_cb_id,                 // 26
+        clear_value_cb_id,                      // 27
+        (uint32_t)pool_type,                    // 28
+        one_scalar_per_core,                    // 29
+        config_cb_id,                           // 30
+        in_nbytes_c,                            // 31
+        shard_width_bytes,                      // 32
+        params.multi_buffering_factor,          // 33
+        stride_w,                               // 34
+        dilation_h,                             // 35
+        dilation_w,                             // 36
+        (uint32_t)return_indices,               // 37
+        pad_t,                                  // 38
+        pad_l,                                  // 39
+        right_inc,                              // 40
+        down_left_wrap_inc,                     // 41
+        up_left_wrap_inc,                       // 42
+        (uint32_t)zero_pages,                   // 43
+        out_cb_id,                              // 44
+        out_idx_cb_id,                          // 45
+        intra_kernel_right_inc,                 // 46
+        intra_kernel_down_left_wrap_inc,        // 47
+        intra_kernel_right_inc_cb_id,           // 48
+        intra_kernel_down_left_wrap_inc_cb_id,  // 49
+        zero_inc_cb_id                          // 50
     };
 
     std::vector<uint32_t> reader1_ct_args = reader0_ct_args;
@@ -751,8 +758,9 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
         intra_kernel_right_inc_cb_id,           // 31
         intra_kernel_down_left_wrap_inc_cb_id,  // 32
         compute_tmp_idx_cb_id,                  // 33
-        kernel_h,                               // 34
-        kernel_w                                // 35
+        zero_inc_cb_id,                         // 34
+        kernel_h,                               // 35
+        kernel_w                                // 36
     };
 
     // Get device arch for compute kernel config initialization
@@ -919,6 +927,7 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
          .intra_kernel_right_inc_cb = intra_kernel_right_inc_cb_id,
          .intra_kernel_down_left_wrap_inc_cb = intra_kernel_down_left_wrap_inc_cb_id,
          .compute_tmp_idx_cb = compute_tmp_idx_cb_id,
+         .zero_inc_cb = zero_inc_cb_id,
          .ncores = ncores,
          .reader_indices_storage = reader_indices_storage,
          .scalar_config_storage = scalar_config_storage}};

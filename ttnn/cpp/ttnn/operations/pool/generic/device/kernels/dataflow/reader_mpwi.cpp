@@ -100,7 +100,8 @@ template <
     uint32_t down_left_wrap_inc_cb_id,
     uint32_t up_left_wrap_inc_cb_id,
     uint32_t intra_kernel_right_inc_cb_id,
-    uint32_t intra_kernel_down_left_wrap_inc_cb_id>
+    uint32_t intra_kernel_down_left_wrap_inc_cb_id,
+    uint32_t zero_inc_cb_id>
 ALWI void initialize_return_indices_data() {
     // since kernels can start in padded regions we need to have "indexes" in these regions
     // we choose a paradigm where we padding indexes must satisfy the following conditions:
@@ -177,6 +178,10 @@ ALWI void initialize_return_indices_data() {
     cb_reserve_back(up_left_wrap_inc_cb_id, 1);
     fill_inc(up_left_wrap_inc_cb_id, up_left_wrap_inc);
     cb_push_back(up_left_wrap_inc_cb_id, 1);
+
+    cb_reserve_back(zero_inc_cb_id, 1);
+    fill_inc(zero_inc_cb_id, 0);
+    cb_push_back(zero_inc_cb_id, 1);
 
     if constexpr (is_large_kernel) {
         cb_reserve_back(intra_kernel_right_inc_cb_id, 1);
@@ -407,6 +412,7 @@ void kernel_main() {
     constexpr uint32_t intra_kernel_down_left_wrap_inc = get_compile_time_arg_val(47);
     constexpr uint32_t intra_kernel_right_inc_cb_id = get_compile_time_arg_val(48);
     constexpr uint32_t intra_kernel_down_left_wrap_inc_cb_id = get_compile_time_arg_val(49);
+    constexpr uint32_t zero_inc_cb_id = get_compile_time_arg_val(50);
 
     constexpr uint32_t eff_kernel_w = (kernel_w - 1) * dilation_w + 1;
 
@@ -452,7 +458,8 @@ void kernel_main() {
             down_left_wrap_inc_cb_id,
             up_left_wrap_inc_cb_id,
             intra_kernel_right_inc_cb_id,
-            intra_kernel_down_left_wrap_inc_cb_id>();
+            intra_kernel_down_left_wrap_inc_cb_id,
+            zero_inc_cb_id>();
     }
 
     // initialize the scalar CB

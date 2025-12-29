@@ -71,15 +71,17 @@ void MAIN {
     constexpr uint32_t intra_kernel_right_inc_cb_id = get_compile_time_arg_val(31);
     constexpr uint32_t intra_kernel_down_left_wrap_inc_cb_id = get_compile_time_arg_val(32);
     constexpr uint32_t compute_tmp_idx_cb_id = get_compile_time_arg_val(33);
-    constexpr uint32_t kernel_h = get_compile_time_arg_val(34);
-    constexpr uint32_t kernel_w = get_compile_time_arg_val(35);
+    constexpr uint32_t zero_inc_cb_id = get_compile_time_arg_val(34);
+    constexpr uint32_t kernel_h = get_compile_time_arg_val(35);
+    constexpr uint32_t kernel_w = get_compile_time_arg_val(36);
 
     constexpr uint32_t mpwi_cb_tile_idx = 0;
     constexpr uint32_t data_dst_idx = 0;
     constexpr uint32_t index_dst_idx = 2;
     constexpr uint32_t inc_dst_idx = 4;
     constexpr uint32_t index_scratch_out_dst_idx = 6;
-    constexpr uint32_t index_temp_dst_idx = 7;  // only used for large kernels
+    constexpr uint32_t index_temp_dst_idx = 3;  // only used for large kernels
+    constexpr uint32_t zero_dst_idx = 7;
 
     constexpr uint32_t face_r_dim = FACE_HEIGHT;
     constexpr bool last_tile_is_partial = in_c % TILE_WIDTH != 0;
@@ -118,6 +120,7 @@ void MAIN {
     cb_wait_front(right_inc_cb_id, 1);
     cb_wait_front(down_left_wrap_inc_cb_id, 1);
     cb_wait_front(up_left_wrap_inc_cb_id, 1);
+    cb_wait_front(zero_inc_cb_id, 1);
     if (is_large_kernel) {
         cb_wait_front(intra_kernel_right_inc_cb_id, 1);
         cb_wait_front(intra_kernel_down_left_wrap_inc_cb_id, 1);
@@ -148,6 +151,7 @@ void MAIN {
                 cb_wait_front(in_idx_cb_id, 1);
                 copy_tile_to_dst_init_short(in_idx_cb_id);
                 reconfig_data_format_srca(in_idx_cb_id);
+                // UNPACK(tt::compute::common::print_full_tile(in_idx_cb_id));
                 copy_tile(
                     in_idx_cb_id, mpwi_cb_tile_idx, index_dst_idx);  // move the initial indexes from the reader to DST
                 cb_pop_front(in_idx_cb_id, 1);
@@ -156,6 +160,7 @@ void MAIN {
                 cb_wait_front(compute_tmp_idx_cb_id, 1);
                 copy_tile_to_dst_init_short(compute_tmp_idx_cb_id);
                 reconfig_data_format_srca(compute_tmp_idx_cb_id);
+                // UNPACK(tt::compute::common::print_full_tile(compute_tmp_idx_cb_id));
                 copy_tile(
                     compute_tmp_idx_cb_id,
                     mpwi_cb_tile_idx,
@@ -170,6 +175,11 @@ void MAIN {
             for (uint32_t chunk = 0; chunk < interm_reduction_chunks; chunk++) {
                 bool first_chunk = chunk == 0;
                 bool last_chunk = chunk == interm_reduction_chunks - 1;
+
+                cb_wait_front(curr_in_cb_id, 1);
+                copy_tile_to_dst_init_short(curr_in_cb_id);
+                reconfig_data_format_srca(curr_in_cb_id);
+                copy_tile(curr_in_cb_id, mpwi_cb_tile_idx, data_dst_idx);
 
                 // increments happen between every chunk within a C block, and between C blocks
                 bool increment_needed = false;
@@ -219,16 +229,16 @@ void MAIN {
                     }
                 }
 
-                if (increment_needed) {
-                    // we allow overflow here for negative values as this only occurs in padding regions
-                    add_int_tile_init();
-                    add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
+                if (!increment_needed) {
+                    // no increment needed, just copy back the original indexes - copy_dest_values does not work
+                    copy_tile_to_dst_init_short(zero_inc_cb_id);
+                    reconfig_data_format_srca(zero_inc_cb_id);
+                    copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                 }
 
-                cb_wait_front(curr_in_cb_id, 1);
-                copy_tile_to_dst_init_short(curr_in_cb_id);
-                reconfig_data_format_srca(curr_in_cb_id);
-                copy_tile(curr_in_cb_id, mpwi_cb_tile_idx, data_dst_idx);
+                // we allow overflow here for negative values as this only occurs in padding regions
+                add_int_tile_init();
+                add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
 
                 // the max_reduce_with_indices LLK function only supports kernel_size=9, pending
                 // https://github.com/tenstorrent/tt-metal/issues/28141 but, since for return_indices the in_cb is
@@ -270,6 +280,7 @@ void MAIN {
             if (!is_last_iteration) {
                 cb_reserve_back(compute_tmp_idx_cb_id, 1);
                 pack_reconfig_data_format(compute_tmp_idx_cb_id);
+                // dprint_tensix_dest_reg(index_scratch_out_dst_idx);
                 pack_tile<true>(
                     index_scratch_out_dst_idx,
                     compute_tmp_idx_cb_id,
