@@ -13,7 +13,7 @@
 #include "compute_kernel_api/add_int_sfpu.h"
 #include "compute_kernel_api/copy_dest_values.h"
 
-#define DEBUG_PRINT 0
+#define DEBUG_PRINT 1
 
 #if DEBUG_PRINT == 1
 #include "api/debug/dprint.h"
@@ -188,16 +188,19 @@ void MAIN {
                             // we reached the bottom right corner, wrap to the top and to the left
                             current_idx_row = 0;
                             copy_tile_to_dst_init_short(up_left_wrap_inc_cb_id);
+                            reconfig_data_format_srca(up_left_wrap_inc_cb_id);
                             copy_tile(up_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {
                             current_idx_row += stride_h;
                             copy_tile_to_dst_init_short(down_left_wrap_inc_cb_id);
+                            reconfig_data_format_srca(down_left_wrap_inc_cb_id);
                             copy_tile(down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         }
                     } else {
                         // we are still in the same row, move to the right
                         current_idx_col += stride_w;
                         copy_tile_to_dst_init_short(right_inc_cb_id);
+                        reconfig_data_format_srca(right_inc_cb_id);
                         copy_tile(right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                     }
                 } else if (is_large_kernel) {  // only need to increment within C block if multiple chunks
@@ -209,11 +212,13 @@ void MAIN {
                         if (intra_kernel_w + sticks_per_chunk < kernel_w) {  // move right in this row
                             intra_kernel_w += sticks_per_chunk;
                             copy_tile_to_dst_init_short(intra_kernel_right_inc_cb_id);
+                            reconfig_data_format_srca(intra_kernel_right_inc_cb_id);
                             copy_tile(intra_kernel_right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {  // move down to the next row
                             intra_kernel_w = 0;
                             intra_kernel_h += 1;
                             copy_tile_to_dst_init_short(intra_kernel_down_left_wrap_inc_cb_id);
+                            reconfig_data_format_srca(intra_kernel_down_left_wrap_inc_cb_id);
                             copy_tile(intra_kernel_down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         }
                     }
@@ -251,12 +256,12 @@ void MAIN {
 
             cb_reserve_back(pack_tmp_cb_id, 1);
             pack_reconfig_data_format(pack_tmp_cb_id);
-            pack_tile<true>(data_dst_idx, pack_tmp_cb_id, mpwi_cb_tile_idx);  // for reader
+            pack_tile<true>(data_dst_idx, pack_tmp_cb_id, mpwi_cb_tile_idx);  // for reader (output data)
             cb_push_back(pack_tmp_cb_id, 1);
 
             cb_reserve_back(pack_idx_tmp_cb_id, 1);
             pack_reconfig_data_format(pack_idx_tmp_cb_id);
-            pack_tile<true>(index_scratch_out_dst_idx, pack_idx_tmp_cb_id, mpwi_cb_tile_idx);  // for reader
+            pack_tile<true>(index_dst_idx, pack_idx_tmp_cb_id, mpwi_cb_tile_idx);  // for reader (output indexes)
             cb_push_back(pack_idx_tmp_cb_id, 1);
 
             // Only push to compute_tmp_idx_cb_id if there's a next iteration that will consume it
@@ -265,7 +270,10 @@ void MAIN {
             if (!is_last_iteration) {
                 cb_reserve_back(compute_tmp_idx_cb_id, 1);
                 pack_reconfig_data_format(compute_tmp_idx_cb_id);
-                pack_tile<true>(index_scratch_out_dst_idx, compute_tmp_idx_cb_id, mpwi_cb_tile_idx);  // for compute
+                pack_tile<true>(
+                    index_scratch_out_dst_idx,
+                    compute_tmp_idx_cb_id,
+                    mpwi_cb_tile_idx);  // for compute (incremented indexes)
                 cb_push_back(compute_tmp_idx_cb_id, 1);
             }
 
