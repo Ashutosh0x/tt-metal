@@ -159,7 +159,7 @@ def run_rms_trace(
     )
     logger.info("Compiling model")
     if use_new_version:
-        tt_out = ttnn.fused_rms_1_1_32_8192(
+        tt_out = ttnn.fused_rms_norm(
             input_tensor,
             layer_norm_config,
             1,
@@ -179,7 +179,7 @@ def run_rms_trace(
         if warmup_iters > 0:
             trace_id_warmup = ttnn.begin_trace_capture(mesh_device, cq_id=0)
             for _ in range(warmup_iters):
-                tt_out = ttnn.fused_rms_1_1_32_8192(
+                tt_out = ttnn.fused_rms_norm(
                     input_tensor,
                     layer_norm_config,
                     1,
@@ -198,7 +198,7 @@ def run_rms_trace(
             ttnn.synchronize_device(mesh_device)
         trace_id = ttnn.begin_trace_capture(mesh_device, cq_id=0)
         for _ in range(num_iters):
-            tt_out = ttnn.fused_rms_1_1_32_8192(
+            tt_out = ttnn.fused_rms_norm(
                 input_tensor,
                 layer_norm_config,
                 1,
@@ -440,7 +440,7 @@ def run_rms_trace_qwen(
     )
     logger.info("Compiling model")
     if use_new_version:
-        tt_out = ttnn.fused_rms_1_1_32_8192(
+        tt_out = ttnn.fused_rms_norm(
             input_tensor,
             layer_norm_config,
             1,
@@ -460,7 +460,7 @@ def run_rms_trace_qwen(
         if warmup_iters > 0:
             trace_id_warmup = ttnn.begin_trace_capture(mesh_device, cq_id=0)
             for _ in range(warmup_iters):
-                tt_out = ttnn.fused_rms_1_1_32_8192(
+                tt_out = ttnn.fused_rms_norm(
                     input_tensor,
                     layer_norm_config,
                     1,
@@ -479,7 +479,7 @@ def run_rms_trace_qwen(
             ttnn.synchronize_device(mesh_device)
         trace_id = ttnn.begin_trace_capture(mesh_device, cq_id=0)
         for _ in range(num_iters):
-            tt_out = ttnn.fused_rms_1_1_32_8192(
+            tt_out = ttnn.fused_rms_norm(
                 input_tensor,
                 layer_norm_config,
                 1,
@@ -737,7 +737,7 @@ def run_rms_fuse_impl(
         )
     for i in range(num_iters):
         # TODO: Change OP infra so that pre makes the post shape, also create external tensor
-        tt_out = ttnn.fused_rms_1_1_32_8192(
+        tt_out = ttnn.fused_rms_norm(
             input_tensor[i],
             layer_norm_config,
             1,
@@ -931,7 +931,7 @@ def run_rms_fuse_impl_qwen(
         )
     for i in range(num_iters):
         # TODO: Change OP infra so that pre makes the post shape, also create external tensor
-        tt_out = ttnn.fused_rms_1_1_32_8192(
+        tt_out = ttnn.fused_rms_norm(
             input_tensor[i],
             layer_norm_config,
             1,

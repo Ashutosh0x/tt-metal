@@ -24,6 +24,9 @@ struct RMSAllGatherSharedVariables {
     tt::tt_metal::CBHandle cb_output{};
     tt::tt_metal::CBHandle cb_output_reshard{};
     std::vector<tt::tt_metal::CoreCoord> cores;
+    // Internal stats tensor - stored here to keep it alive during async execution
+    // This tensor is created internally when stats is not provided externally
+    std::optional<Tensor> internal_stats_tensor;
 };
 
 struct RMSAllGatherMeshWorkloadFactory {

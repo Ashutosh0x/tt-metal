@@ -91,8 +91,11 @@ RMSAllGatherMeshWorkloadFactory::cached_program_t RMSAllGatherMeshWorkloadFactor
     uint32_t stats_page_size;
     tt::DataFormat in_data_format = tt::tt_metal::datatype_to_dataformat_converter(a.dtype());
     tt::DataFormat out_data_format = tt::tt_metal::datatype_to_dataformat_converter(output.dtype());
-    tt::DataFormat stats_data_format = tt::tt_metal::datatype_to_dataformat_converter(stats.value().dtype());
+    tt::DataFormat stats_data_format = in_data_format;
     tt::DataFormat residual_data_format = in_data_format;
+
+    // Stats is guaranteed to exist (created internally if not provided externally)
+    stats_data_format = tt::tt_metal::datatype_to_dataformat_converter(stats.value().dtype());
     if (b) {
         residual_data_format = tt::tt_metal::datatype_to_dataformat_converter(b.value().dtype());
     }
@@ -101,6 +104,7 @@ RMSAllGatherMeshWorkloadFactory::cached_program_t RMSAllGatherMeshWorkloadFactor
     } else {
         output_page_size = output.buffer()->page_size();
     }
+    // Stats tensor page size
     if (stats.value().layout() == Layout::TILE) {
         stats_page_size = stats.value().tensor_spec().tile().get_tile_size(stats_data_format);
     } else {
@@ -129,6 +133,8 @@ RMSAllGatherMeshWorkloadFactory::cached_program_t RMSAllGatherMeshWorkloadFactor
     // Tensor Info
     const auto input_tensor_cores = a.memory_config().shard_spec()->grid;
     const auto output_tensor_cores = output.memory_config().shard_spec()->grid;
+    // Stats tensor is now guaranteed to exist (created internally if not provided externally)
+    TT_FATAL(stats.has_value(), "Stats tensor must be provided (internal creation should ensure this)");
     const auto stats_tensor_cores = stats.value().memory_config().shard_spec()->grid;
     const auto stats_tensor_shard_shape = stats.value().memory_config().shard_spec()->shape;
     const auto stats_tensor_shard_num_pages = stats_tensor_shard_shape[0] * stats_tensor_shard_shape[1] / TILE_HW;
@@ -244,13 +250,10 @@ RMSAllGatherMeshWorkloadFactory::cached_program_t RMSAllGatherMeshWorkloadFactor
     ////////////////////////////////////////////////////////////////////////////
     // block size for in0 (tensor a)
     uint32_t in0_block_tiles = block_wt;
-    // post_all_gather_stats_block_tiles
-    uint32_t post_all_gather_stats_block_tiles = 1;
-    uint32_t num_distributed_devices = 1;
-    if (stats.has_value()) {
-        post_all_gather_stats_block_tiles = stats.value().padded_shape()[-1] / TILE_WIDTH;
-        num_distributed_devices = post_all_gather_stats_block_tiles;
-    }
+    // post_all_gather_stats_block_tiles - stats tensor width determines number of distributed devices
+    // Stats shape is (1, 1, 32, num_devices * TILE_WIDTH), so stats_width / TILE_WIDTH = num_devices
+    uint32_t post_all_gather_stats_block_tiles = stats.value().padded_shape()[-1] / TILE_WIDTH;
+    uint32_t num_distributed_devices = post_all_gather_stats_block_tiles;
 
     uint32_t in0_CB_size = in0_block_tiles * in_single_tile_size;
     // block size for in1 (tensor b)
@@ -587,7 +590,7 @@ RMSAllGatherMeshWorkloadFactory::cached_program_t RMSAllGatherMeshWorkloadFactor
             .set_page_size(cb_stats_reduced_index, single_tile_size);
     tt::tt_metal::CreateCircularBuffer(program, sender_cores, stats_reduced_cb_config);
 
-    // cb_stats
+    // cb_stats - stats is guaranteed to exist (created internally if not provided)
     uint32_t cb_stats_index = tt::CBIndex::c_19;
     tt::tt_metal::CircularBufferConfig stats_cb_config =
         tt::tt_metal::CircularBufferConfig(stats_cb_size, {{cb_stats_index, cb_data_format}})
@@ -1221,7 +1224,10 @@ RMSAllGatherMeshWorkloadFactory::cached_program_t RMSAllGatherMeshWorkloadFactor
             .cb_stats = cb_stats,
             .cb_output = cb_output,
             .cb_output_reshard = cb_output_reshard,
-            .cores = cores});
+            .cores = cores,
+            // Store the stats tensor to keep it alive during async execution
+            // The tensor is reference-counted, so this copy keeps the underlying buffer allocated
+            .internal_stats_tensor = stats.has_value() ? std::make_optional(stats.value()) : std::nullopt});
 }
 
 RMSAllGatherMeshWorkloadFactory::cached_mesh_workload_t RMSAllGatherMeshWorkloadFactory::create_mesh_workload(

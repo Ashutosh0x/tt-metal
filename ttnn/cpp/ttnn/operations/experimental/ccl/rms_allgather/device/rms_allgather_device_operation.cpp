@@ -306,11 +306,47 @@ RMSAllGatherDeviceOperation::invoke(
         cluster_axis,
         use_noc1_only);
 
+    // Create internal stats tensor if not provided
+    // Stats tensor is used for cross-device all-gather of partial E(x²) statistics
+    // Shape: (1, 1, 32, num_devices * TILE_WIDTH) - one tile per device
+    auto get_or_create_stats = [&]() -> std::optional<Tensor> {
+        if (stats.has_value()) {
+            // Return a non-const copy of the external stats tensor
+            return Tensor(stats.value());
+        }
+        // Create internal stats tensor
+        // Get the input shard spec to create matching stats tensor on first core
+        const auto& input_shard_spec = input_tensor.shard_spec().value();
+        // Use first core from input shard grid for stats tensor
+        CoreRange first_core(
+            input_shard_spec.grid.bounding_box().start_coord, input_shard_spec.grid.bounding_box().start_coord);
+        CoreRangeSet stats_core_grid({first_core});
+
+        // Stats shape: one tile (32x32) per device, sharded on single core
+        uint32_t stats_width = num_devices * TILE_WIDTH;
+        auto stats_shape = ttnn::Shape({1, 1, TILE_HEIGHT, stats_width});
+
+        // Create sharded memory config for stats - width sharded on single core
+        auto stats_shard_spec = ShardSpec(
+            stats_core_grid,
+            {TILE_HEIGHT, stats_width},  // Full stats tensor on one core
+            ShardOrientation::ROW_MAJOR);
+        auto stats_mem_config = MemoryConfig{TensorMemoryLayout::WIDTH_SHARDED, BufferType::L1, stats_shard_spec};
+
+        // Create the stats tensor spec and allocate
+        auto stats_spec =
+            TensorSpec(stats_shape, TensorLayout(DataType::BFLOAT16, PageConfig(Layout::TILE), stats_mem_config));
+
+        return create_device_tensor(stats_spec, input_tensor.device());
+    };
+
+    auto stats_tensor = get_or_create_stats();
+
     tensor_args_t tensor_args{
         .input = input_tensor,
         .residual_input_tensor = residual_input_tensor,
         .weight = weight,
-        .stats = stats,
+        .stats = stats_tensor,
         .preallocated_output = persistent_output_tensor};
 
     return {std::move(operation_attributes), std::move(tensor_args)};
