@@ -74,12 +74,13 @@ void MAIN {
     constexpr uint32_t zero_inc_cb_id = get_compile_time_arg_val(34);
     constexpr uint32_t kernel_h = get_compile_time_arg_val(35);
     constexpr uint32_t kernel_w = get_compile_time_arg_val(36);
+    constexpr uint32_t clear_value_cb_id = get_compile_time_arg_val(37);
 
     constexpr uint32_t mpwi_cb_tile_idx = 0;
     constexpr uint32_t data_dst_idx = 0;
-    // dst 1 used for accumulation for large kernel
+    constexpr uint32_t data_accum_dst_idx = 1;
     constexpr uint32_t index_dst_idx = 2;
-    // dst 3 used for accumulation for large kernel
+    constexpr uint32_t index_accum_dst_idx = 3;
     constexpr uint32_t inc_dst_idx = 4;
     constexpr uint32_t index_scratch_out_dst_idx = 6;
     constexpr uint32_t index_temp_dst_idx = 5;  // only used for large kernels
@@ -126,6 +127,7 @@ void MAIN {
     if (is_large_kernel) {
         cb_wait_front(intra_kernel_right_inc_cb_id, 1);
         cb_wait_front(intra_kernel_down_left_wrap_inc_cb_id, 1);
+        cb_wait_front(clear_value_cb_id, 1);
     }
 
     unary_op_init_common(in_cb_id_0, in_cb_id_0);
@@ -176,6 +178,17 @@ void MAIN {
             if constexpr (is_large_kernel) {
                 copy_dest_values_init();
                 copy_dest_values(index_dst_idx, index_temp_dst_idx);  // save base indices for this C block
+
+                // clear the accumulation tiles since they will contain garbage data which is partially loaded
+                // since max SFPU offset if 62 DST rows, but 4 rows are loaded each time so we load 2 rows of
+                // DST tiles 1 and 3 during the reduction of tiles 0 and 2
+                copy_tile_to_dst_init_short(clear_value_cb_id);
+                reconfig_data_format_srca(clear_value_cb_id);
+                copy_tile(clear_value_cb_id, mpwi_cb_tile_idx, data_accum_dst_idx);
+                copy_tile(
+                    clear_value_cb_id,
+                    mpwi_cb_tile_idx,
+                    index_accum_dst_idx);  // TODO probably don't need to clear indexes
             }
 
             for (uint32_t chunk = 0; chunk < interm_reduction_chunks; chunk++) {
@@ -251,11 +264,18 @@ void MAIN {
                 constexpr uint32_t max_mpwi_kernel_size = window_size_hw <= 9 ? 9 : 32;
                 // TODO update SFPU to do DST accumulation
                 // TODO use 9 stick version for large kernel if chunk size allows
+
+                MATH(DPRINT << "Before MPWI:" << ENDL());
+                dprint_tensix_dest_reg(0);
+                MATH(DPRINT << "--" << ENDL());
+
                 max_reduce_with_indices_init<ckernel::DataLayout::ROW_MAJOR>();
                 max_reduce_with_indices<max_mpwi_kernel_size, ckernel::DataLayout::ROW_MAJOR, is_large_kernel>(
                     data_dst_idx, index_dst_idx, chunk);
 
-                MATH(DPRINT << "REDUCE" << ENDL());
+                MATH(DPRINT << "After MPWI:" << ENDL());
+                dprint_tensix_dest_reg(0);
+                MATH(DPRINT << "--" << ENDL());
 
                 if constexpr (is_large_kernel) {
                     if (!last_chunk) {

@@ -760,7 +760,8 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
         compute_tmp_idx_cb_id,                  // 33
         zero_inc_cb_id,                         // 34
         kernel_h,                               // 35
-        kernel_w                                // 36
+        kernel_w,                               // 36
+        clear_value_cb_id                       // 37
     };
 
     // Get device arch for compute kernel config initialization
@@ -774,12 +775,13 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
         false,                                         // math_approx_mode
         params.is_avg_pool && params.is_large_kernel,  // fp32_dest_acc_en
         false,                                         // packer_l1_acc
-        false                                          // dst_full_sync_en
+        params.is_large_kernel && return_indices       // dst_full_sync_en
     );
 
     auto compute_config = tt::tt_metal::ComputeConfig{
         .math_fidelity = get_math_fidelity(device_compute_kernel_config),
         .fp32_dest_acc_en = get_fp32_dest_acc_en(device_compute_kernel_config),
+        .dst_full_sync_en = get_dst_full_sync_en(device_compute_kernel_config),
         .math_approx_mode = false,
         .compile_args = compute_ct_args,
         .defines = get_defines(pool_type)};

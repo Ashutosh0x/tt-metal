@@ -426,6 +426,7 @@ void kernel_main() {
     constexpr bool is_large_kernel = window_size_hw > max_sticks_for_reduction;
     constexpr bool wide_reduction = in_nblocks_c > 1;
     // we only need to initialize the in_cb if we will not fill each reduction chunk with valid data
+    // and MPWI compute uses the clear value CB to initialize DST 1 and 3 (the accumulation tiles) for large kernels
     constexpr bool need_to_initialize_in_cb = true;
     constexpr uint32_t in_cb_ntiles = in_cb_sz / (TILE_WIDTH * TILE_HEIGHT);  // only use the non-multi buffering size
 
@@ -433,6 +434,7 @@ void kernel_main() {
     if constexpr (need_to_initialize_in_cb) {
         if constexpr (reader_id == 0) {
             fill_with_val(get_write_ptr(clear_value_cb_id), TILE_HEIGHT * TILE_WIDTH, bf16_init_value);
+            cb_push_back(clear_value_cb_id, 1);
             clear_out_tiles<in_cb_id, clear_value_cb_id>();
         }
     }
