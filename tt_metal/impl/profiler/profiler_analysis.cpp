@@ -537,7 +537,7 @@ void writeProgramsPerfResultsToCSV(
     log_file_ofs.close();
 
     // Emit a compact stdout summary for kernel device time (useful for CI triage).
-    // Histogram buckets are log-spaced over the observed [min..max] for this dump.
+    // Histogram buckets are uniformly-spaced over the observed [min..max] for this dump.
     constexpr uint32_t HIST_BUCKETS = 10;
 
     auto choose_quantized_bucket_size =
