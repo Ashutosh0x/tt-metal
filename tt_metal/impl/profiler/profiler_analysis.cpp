@@ -635,30 +635,43 @@ void writeProgramsPerfResultsToCSV(
             counts[bucket_idx]++;
         }
 
-        std::string buckets_str;
-        for (size_t i = 0; i < counts.size(); ++i) {
-            const uint64_t lo = edges[i];
-            const uint64_t hi = edges[i + 1];
-            buckets_str += fmt::format("[{}..{}):{}", lo, hi, counts[i]);
-            if (i + 1 < counts.size()) {
-                buckets_str += " ";
-            }
+        // Render ASCII histogram.
+        constexpr size_t BAR_WIDTH = 40;
+        uint64_t max_count = 0;
+        for (uint64_t c : counts) {
+            max_count = std::max(max_count, c);
         }
+
+        auto bar = [&](uint64_t c) -> std::string {
+            if (max_count == 0) {
+                return std::string(BAR_WIDTH, ' ');
+            }
+            const double frac = static_cast<double>(c) / static_cast<double>(max_count);
+            size_t filled = static_cast<size_t>(std::llround(frac * static_cast<double>(BAR_WIDTH)));
+            filled = std::min(filled, BAR_WIDTH);
+            return std::string(filled, '#') + std::string(BAR_WIDTH - filled, ' ');
+        };
 
         log_info(
             tt::LogMetal,
-            "C++ perf histogram (device={}, ns, buckets={} bucket_size={} range=[{}..{}]): {} | underflow(<{}ns)={} "
-            "overflow(>={}ns)={}",
+            "C++ perf histogram (device={}): DEVICE KERNEL DURATION [ns] (buckets={}, bucket_size={}ns, "
+            "range=[{}..{}), "
+            "underflow(<{}ns)={}, overflow(>={}ns)={})",
             device_id,
             HIST_BUCKETS,
             bucket_size,
             start,
             end,
-            buckets_str,
             start,
             underflow,
             end,
             overflow);
+
+        for (size_t i = 0; i < counts.size(); ++i) {
+            const uint64_t lo = edges[i];
+            const uint64_t hi = edges[i + 1];
+            log_info(tt::LogMetal, "  [{:>12} .. {:>12}) |{}| {:>8}", lo, hi, bar(counts[i]), counts[i]);
+        }
     };
 
     for (const auto& [device_id, samples] : kernel_durations_ns_by_device) {
