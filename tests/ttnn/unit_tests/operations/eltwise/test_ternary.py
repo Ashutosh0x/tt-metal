@@ -229,3 +229,32 @@ def test_addcmul_with_bcast_bf8b(device, torch_dtype, ttnn_dtype, a_shape, b_sha
     torch_output_tensor = golden_fn(torch_input_tensor, torch_input_tensor1, torch_input_tensor2, value=value)
 
     assert_with_pcc(torch_output_tensor, output_tensor, 0.999)
+
+
+@pytest.mark.parametrize(
+    "torch_dtype, ttnn_dtype",
+    [
+        (torch.bfloat16, ttnn.bfloat16),
+        (torch.float32, ttnn.float32),
+    ],
+)
+@pytest.mark.parametrize("value", [1.0, 0.5])
+def test_addcmul(device, torch_dtype, ttnn_dtype, value):
+    in_data1 = torch.rand((5), dtype=torch_dtype).uniform_(-100, 100)
+    in_data2 = torch.rand((5), dtype=torch_dtype).uniform_(-80, 80)
+    in_data3 = torch.rand((5), dtype=torch_dtype).uniform_(-90, 90)
+
+    input_tensor1 = ttnn.from_torch(in_data1, dtype=ttnn_dtype, layout=ttnn.TILE_LAYOUT, device=device)
+    input_tensor2 = ttnn.from_torch(in_data2, dtype=ttnn_dtype, layout=ttnn.TILE_LAYOUT, device=device)
+    input_tensor3 = ttnn.from_torch(in_data3, dtype=ttnn_dtype, layout=ttnn.TILE_LAYOUT, device=device)
+
+    output_tensor = ttnn.addcmul(input_tensor1, input_tensor2, input_tensor3, value=value)
+    output_tensor = ttnn.to_torch(output_tensor)
+    golden_fn = ttnn.get_golden_function(ttnn.addcmul)
+    golden_tensor = golden_fn(in_data1, in_data2, in_data3, value=value)
+    print("in_data1: ", in_data1)
+    print("in_data2: ", in_data2)
+    print("in_data3: ", in_data3)
+    print("golden_tensor: ", golden_tensor)
+    print("output_tensor: ", output_tensor)
+    assert_with_pcc(golden_tensor, output_tensor, 0.999)

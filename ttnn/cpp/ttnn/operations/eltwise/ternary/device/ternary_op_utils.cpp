@@ -287,6 +287,16 @@ std::map<std::string, std::string> get_compute_defines(TernaryOpType op_type, Da
         case TernaryOpType::ADDCMUL:
             // ADDCMUL uses a separate kernel that implements the operation using existing add/mul tiles
             // No SFPU macros needed since we use binary operations directly
+            defines["TERNARY_SFPU_OP_INIT"] = "addcmul_tile_init";
+            if (dtype == DataType::FLOAT32) {
+                defines["TERNARY_SFPU_OP_FUNC"] = "addcmul_fp32_tile";
+            } else if (dtype == DataType::INT32) {
+                defines["TERNARY_SFPU_OP_FUNC"] = "addcmul_int32_tile";
+            } else if (dtype == DataType::UINT32) {
+                defines["TERNARY_SFPU_OP_FUNC"] = "addcmul_uint32_tile";
+            } else {
+                defines["TERNARY_SFPU_OP_FUNC"] = "addcmul_tile";
+            }
             break;
         default: TT_FATAL(false, "Unsupported ternary operation type");
     }

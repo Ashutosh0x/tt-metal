@@ -801,10 +801,11 @@ void set_or_update_runtime_arguments(
             scalar_arg = pack_scalar_runtime_arg(operation_attributes.scalar_input_b.value(), output.dtype());
         } else if (variant == TernaryVariant::TST) {
             scalar_arg = pack_scalar_runtime_arg(operation_attributes.scalar_input_a.value(), output.dtype());
-        } else if (
-            operation_attributes.ternary_op_type == TernaryOpType::ADDCMUL &&
-            operation_attributes.scalar_input_a.has_value()) {
-            scalar_arg = pack_scalar_runtime_arg(operation_attributes.scalar_input_a.value(), output.dtype());
+        } else if (operation_attributes.ternary_op_type == TernaryOpType::ADDCMUL) {
+            // For ADDCMUL, always set scalar_arg (default to 1.0f if not provided)
+            float scalar_value =
+                operation_attributes.scalar_input_a.has_value() ? operation_attributes.scalar_input_a.value() : 1.0f;
+            scalar_arg = pack_scalar_runtime_arg(scalar_value, output.dtype());
         }
         auto [freq, counter] = [&] {
             switch (broadcast_type) {
