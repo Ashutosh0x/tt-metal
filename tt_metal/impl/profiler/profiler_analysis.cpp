@@ -96,7 +96,7 @@ experimental::DurationHistogram make_quantized_histogram_ns(
     const uint64_t bucket_size = choose_quantized_bucket_size(min_ns, max_ns, buckets, quantum_ns);
     const uint64_t start = (min_ns / bucket_size) * bucket_size;
     const uint64_t end =
-        static_cast<uint64_t>(static_cast<__int128>(start) + static_cast<__int128>(bucket_size) * buckets);
+        static_cast<uint64_t>(static_cast<__int128>(start) + (static_cast<__int128>(bucket_size) * buckets));
 
     hist.min_ns = start;
     hist.max_ns = end;
