@@ -77,10 +77,12 @@ void MAIN {
 
     constexpr uint32_t mpwi_cb_tile_idx = 0;
     constexpr uint32_t data_dst_idx = 0;
+    // dst 1 used for accumulation for large kernel
     constexpr uint32_t index_dst_idx = 2;
+    // dst 3 used for accumulation for large kernel
     constexpr uint32_t inc_dst_idx = 4;
     constexpr uint32_t index_scratch_out_dst_idx = 6;
-    constexpr uint32_t index_temp_dst_idx = 3;  // only used for large kernels
+    constexpr uint32_t index_temp_dst_idx = 5;  // only used for large kernels
     constexpr uint32_t zero_dst_idx = 7;
 
     constexpr uint32_t face_r_dim = FACE_HEIGHT;
@@ -134,6 +136,10 @@ void MAIN {
     // runtime args are used while for grid sample the max out sticks is set
     uint32_t num_out_sticks_this_core = max_out_sticks_per_core ? max_out_sticks_per_core : get_arg_val<uint32_t>(0);
 
+    DPRINT << "num_out_sticks_this_core: " << num_out_sticks_this_core << ENDL();
+    DPRINT << "in_nblocks_c: " << in_nblocks_c << ENDL();
+    DPRINT << "interm_reduction_chunks: " << interm_reduction_chunks << ENDL();
+
     uint32_t tilize_stick_counter = 0;
     uint32_t tilize_stick_total = 0;
     bool first_iteration = true;
@@ -169,7 +175,7 @@ void MAIN {
             }
             if constexpr (is_large_kernel) {
                 copy_dest_values_init();
-                copy_dest_values(index_dst_idx, index_temp_dst_idx);  // make a copy for large kernel use
+                copy_dest_values(index_dst_idx, index_temp_dst_idx);  // save base indices for this C block
             }
 
             for (uint32_t chunk = 0; chunk < interm_reduction_chunks; chunk++) {
@@ -209,10 +215,7 @@ void MAIN {
                         copy_tile(right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                     }
                 } else if (is_large_kernel) {  // only need to increment within C block if multiple chunks
-                    if (last_chunk) {          // reset to the initial indexes for this C block
-                        copy_dest_values_init();
-                        copy_dest_values(index_temp_dst_idx, index_dst_idx);
-                    } else {  // increment for the next chunk within the same C block
+                    if (!last_chunk) {         // increment for the next chunk within the same C block
                         increment_needed = true;
                         if (intra_kernel_w + sticks_per_chunk < kernel_w) {  // move right in this row
                             intra_kernel_w += sticks_per_chunk;
@@ -247,20 +250,32 @@ void MAIN {
                 // smaller than 9 as the excess sticks are just filled with padding values
                 constexpr uint32_t max_mpwi_kernel_size = window_size_hw <= 9 ? 9 : 32;
                 // TODO update SFPU to do DST accumulation
+                // TODO use 9 stick version for large kernel if chunk size allows
                 max_reduce_with_indices_init<ckernel::DataLayout::ROW_MAJOR>();
-                max_reduce_with_indices<max_mpwi_kernel_size, ckernel::DataLayout::ROW_MAJOR>(
-                    data_dst_idx, index_dst_idx);
+                max_reduce_with_indices<max_mpwi_kernel_size, ckernel::DataLayout::ROW_MAJOR, is_large_kernel>(
+                    data_dst_idx, index_dst_idx, chunk);
 
-                if (is_large_kernel && !last_chunk) {
-                    copy_dest_values_init();
-                    copy_dest_values(
-                        index_scratch_out_dst_idx, index_dst_idx);  // update the index DST for the next chunk
-                    copy_dest_values(
-                        index_scratch_out_dst_idx, index_temp_dst_idx);  // make a copy for large kernel use
+                MATH(DPRINT << "REDUCE" << ENDL());
+
+                if constexpr (is_large_kernel) {
+                    if (!last_chunk) {
+                        copy_dest_values_init();
+                        copy_dest_values(index_scratch_out_dst_idx, index_dst_idx);
+                    }
                 }
 
                 cb_pop_front(curr_in_cb_id, 1);
             }
+
+            // After all chunks: if not last C block, restore base indices for next C block
+            if constexpr (is_large_kernel) {
+                if (!last_c_block) {
+                    copy_dest_values_init();
+                    copy_dest_values(
+                        index_temp_dst_idx, index_scratch_out_dst_idx);  // restore base indices for next C block
+                }
+            }
+
             tile_regs_commit();
             tile_regs_wait();
 

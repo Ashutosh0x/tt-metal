@@ -598,16 +598,27 @@ ALWI void topk_tile_init() { MATH((llk_math_eltwise_unary_sfpu_topk_init<true>()
  * |-----------------|--------------------------------------------------------------------------|------------|-------------------------------------------------------|----------|
  * | idst            | The index of the tile in DST register containing the data to be reduced  | uint32_t   | Must be less than the size of the DST register buffer | True     |
  * | idst_idx        | The index of the tile in DST register containing the indices of the data | uint32_t   | Must be less than the size of the DST register buffer | True     |
+ * | chunk           | The chunk number for large kernel accumulation                           | uint32_t   | 0 to 3                                                | True     |
  * | num_rows        | The number of rows to use for the MaxPool operation                      | uint32_t   | {9}                                                   | True     |
  * | layout          | The data layout of the data in DST                                       | DataLayout | TILE or ROW_MAJOR                                     | False    |
+ * | accumulate      | Whether to accumulate results for large kernels                          | bool       | true, false                                           | False    |
  * | ITERATIONS      | The number of iterations to perform (unused)                             | int        | 1 to 8                                                | False    |
  */
 // clang-format on
-template <int num_rows = 9, ckernel::DataLayout layout = ckernel::DataLayout::TILE, int ITERATIONS = 8>
-ALWI void max_reduce_with_indices(uint32_t idst, uint32_t idst_idx) {
+template <
+    int num_rows = 9,
+    ckernel::DataLayout layout = ckernel::DataLayout::TILE,
+    bool accumulate = false,
+    int ITERATIONS = 8>
+ALWI void max_reduce_with_indices(uint32_t idst, uint32_t idst_idx, uint32_t chunk) {
     static_assert(num_rows <= 32, "num_rows must be <= 32");
-    MATH((llk_math_eltwise_binary_sfpu_max_pool_with_indices<true, DST_ACCUM_MODE, num_rows, ITERATIONS, layout>(
-        idst, idst_idx)));
+    MATH((llk_math_eltwise_binary_sfpu_max_pool_with_indices<
+          true,
+          DST_ACCUM_MODE,
+          num_rows,
+          ITERATIONS,
+          layout,
+          accumulate>(idst, idst_idx, chunk)));
 }
 
 /**

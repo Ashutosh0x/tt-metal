@@ -155,7 +155,7 @@ def run_max_pool2d_with_indices(
 
     tensor_shape = (in_n, in_c, in_h, in_w)
     ttnn_input_shape = (1, 1, in_n * in_h * in_w, in_c)
-    torch_input = torch.randn(tensor_shape, dtype=torch.bfloat16)
+    torch_input = torch.zeros(tensor_shape, dtype=torch.bfloat16)
     # torch_input = torch.zeros(tensor_shape, dtype=torch.bfloat16)
     # for n in range(in_n):
     #     for c in range(in_c):
@@ -233,6 +233,9 @@ def run_max_pool2d_with_indices(
     # TTNN output is in shape (1, 1, in_n * out_h * out_w, channels)
     ttnn_output_reshaped = ttnn_output_torch.reshape(in_n, out_h, out_w, in_c)
     ttnn_indices_reshaped = ttnn_indices_torch.reshape(in_n, out_h, out_w, in_c)
+
+    print(ttnn_output_reshaped.flatten())
+    print(torch_output_reshaped.flatten())
 
     atol, rtol = torch.testing._comparison.default_tolerances(torch.bfloat16)
     if ttnn_dtype == ttnn.bfloat8_b:
