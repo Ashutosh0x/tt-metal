@@ -83,8 +83,8 @@ struct DurationHistogram {
     // Bucket counts. Size is num_buckets.
     std::vector<uint64_t> bucket_counts;
 
-    uint64_t underflow = 0;  // samples < min_ns
-    uint64_t overflow = 0;   // samples > max_ns
+    uint64_t underflow = 0;  // samples < histogram start
+    uint64_t overflow = 0;   // samples >= histogram end
 };
 
 struct KernelDurationSummary {
