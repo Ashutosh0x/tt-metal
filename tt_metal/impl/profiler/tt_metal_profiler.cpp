@@ -1187,9 +1187,7 @@ experimental::KernelDurationSummary summarize_kernel_duration_for_program_set(
             hist_max = summary.count > 0 ? summary.max_ns : FALLBACK_MAX_NS;
         }
     }
-    if (hist_max < hist_min) {
-        hist_max = hist_min;
-    }
+    hist_max = std::max(hist_max, hist_min);
 
     summary.histogram = make_quantized_histogram_ns(kernel_durations_ns, hist_min, hist_max, histogram_buckets);
 
