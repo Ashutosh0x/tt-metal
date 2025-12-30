@@ -238,14 +238,17 @@ void MAIN {
                     }
                 }
 
-                if (increment_needed) {
-                    // we allow overflow here for negative values as this only occurs in padding regions
-                    add_int_tile_init();
-                    add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
-                } else {
-                    copy_dest_values_init();
-                    copy_dest_values(index_scratch_out_dst_idx, index_dst_idx);
+                // TODO use copy_dest_values here, but currently this causes data type issues with multiple C blocks
+                if (!increment_needed) {
+                    // no increment needed, just copy back the original indexes - copy_dest_values does not work
+                    copy_tile_to_dst_init_short(zero_inc_cb_id);
+                    reconfig_data_format_srca(zero_inc_cb_id);
+                    copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                 }
+
+                // we allow overflow here for negative values as this only occurs in padding regions
+                add_int_tile_init();
+                add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
 
                 // the max_reduce_with_indices LLK function only supports kernel_size=9, pending
                 // https://github.com/tenstorrent/tt-metal/issues/28141 but, since for return_indices the in_cb is
