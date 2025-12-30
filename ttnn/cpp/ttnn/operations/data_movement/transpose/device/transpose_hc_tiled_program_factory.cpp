@@ -185,7 +185,7 @@ TransposeHCTiledProgramFactory::cached_program_t TransposeHCTiledProgramFactory:
     reader_compile_time_args.push_back(alignment);
     TensorAccessorArgs(*src0_buffer).append_to(reader_compile_time_args);
 
-    std::vector<uint32_t> writer_compile_time_args = {src0_cb_index};
+    std::vector<uint32_t> writer_compile_time_args = {src0_cb_index, single_tile_size};
     TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);
 
     KernelHandle reader_kernel_id = CreateKernel(

@@ -47,7 +47,7 @@ ReshapeTileProgramFactory::cached_program_t ReshapeTileProgramFactory::create(
     std::vector<uint32_t> reader_compile_time_args = {alignment};
     tt::tt_metal::TensorAccessorArgs(*src0_buffer).append_to(reader_compile_time_args);
 
-    std::vector<uint32_t> writer_compile_time_args = {(std::uint32_t)src0_cb_index};
+    std::vector<uint32_t> writer_compile_time_args = {src0_cb_index, single_tile_size};
     tt::tt_metal::TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);
 
     if (alignment > (tt::constants::FACE_WIDTH * input_tensor.element_size())) {

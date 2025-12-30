@@ -69,7 +69,7 @@ NlpCreateQkvHeadsFalcon7BProgramFactory::cached_program_t NlpCreateQkvHeadsFalco
     ////////////////////////////////////////////////////////////////////////////
     tt_metal::Program program = tt_metal::CreateProgram();
 
-    std::vector<uint32_t> reader_compile_time_args;
+    std::vector<uint32_t> reader_compile_time_args{single_tile_size};
     tt_metal::TensorAccessorArgs(*in0_buffer).append_to(reader_compile_time_args);
     std::vector<uint32_t> writer_compile_time_args = {
         (std::uint32_t)q_num_tiles_per_tensor,

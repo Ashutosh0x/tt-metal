@@ -114,7 +114,7 @@ TilizeWithValPaddingMultiCoreInterleavedFactory::create(
 
     /** writer
      */
-    std::vector<uint32_t> writer_compile_time_args = {output_cb_index};
+    std::vector<uint32_t> writer_compile_time_args = {output_cb_index, output_single_tile_size};
     tt::tt_metal::TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);
     KernelHandle unary_writer_kernel_id = CreateKernel(
         program,

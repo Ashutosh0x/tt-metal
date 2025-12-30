@@ -113,7 +113,7 @@ BcastMultiCoreHWProgramFactory::cached_program_t BcastMultiCoreHWProgramFactory:
     }
     const auto cb_output = CreateCircularBuffer(program, all_device_cores, output_cb_config);
 
-    std::vector<uint32_t> writer_compile_time_args = {(std::uint32_t)output_cb_index};
+    std::vector<uint32_t> writer_compile_time_args = {output_cb_index, dst_single_tile_size};
     TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);
 
     std::map<std::string, std::string> reader_defines;

@@ -99,7 +99,7 @@ PadTileCoreProgramFactory::cached_program_t PadTileCoreProgramFactory::create(
 
     // Reader compile-time args
     // Data is 32 byte aligned
-    std::vector<uint32_t> reader_compile_time_args;
+    std::vector<uint32_t> reader_compile_time_args{single_tile_size};
     tt::tt_metal::TensorAccessorArgs(*src0_buffer).append_to(reader_compile_time_args);
     std::vector<uint32_t> writer_compile_time_args = {src0_cb_index, src1_cb_index};
     TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);

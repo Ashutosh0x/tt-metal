@@ -55,7 +55,7 @@ TransposeCNProgramFactory::cached_program_t TransposeCNProgramFactory::create(
 
     std::vector<uint32_t> reader_compile_time_args = {static_cast<uint32_t>(src0_cb_index)};
     TensorAccessorArgs(*src0_buffer).append_to(reader_compile_time_args);
-    std::vector<uint32_t> writer_compile_time_args = {static_cast<uint32_t>(src0_cb_index)};
+    std::vector<uint32_t> writer_compile_time_args = {src0_cb_index, single_tile_size};
     TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);
 
     KernelHandle reader_kernel_id = CreateKernel(

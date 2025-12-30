@@ -111,7 +111,7 @@ NLPConcatHeadsProgramFactory::cached_program_t NLPConcatHeadsProgramFactory::cre
             (std::uint32_t)in0_HtWt,
         };
         tt_metal::TensorAccessorArgs(*in0_buffer).append_to(reader_compile_time_args);
-        std::vector<uint32_t> writer_compile_time_args = {(std::uint32_t)src0_cb_index};
+        std::vector<uint32_t> writer_compile_time_args = {src0_cb_index, single_tile_size};
         tt_metal::TensorAccessorArgs(*out_buffer).append_to(writer_compile_time_args);
         reader_kernel_id = tt_metal::CreateKernel(
             program,

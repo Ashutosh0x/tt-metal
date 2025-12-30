@@ -272,7 +272,7 @@ TransposeWHProgramFactory::cached_program_t TransposeWHProgramFactory::create(
     }
     TensorAccessorArgs(*src0_buffer).append_to(reader_compile_time_args);
 
-    std::vector<uint32_t> writer_compile_time_args = {output_cb_index};
+    std::vector<uint32_t> writer_compile_time_args = {output_cb_index, dst_single_tile_size};
     if (row_major) {
         writer_compile_time_args.push_back(ht);
         writer_compile_time_args.push_back(H);

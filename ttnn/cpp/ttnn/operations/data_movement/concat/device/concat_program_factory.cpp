@@ -152,7 +152,7 @@ ConcatProgramFactory::cached_program_t ConcatProgramFactory::create(
     if (rm_layout) {
         writer_compile_time_args = {(std::uint32_t)src0_cb_index, dst_buffer->page_size()};
     } else {
-        writer_compile_time_args = {(std::uint32_t)src0_cb_index};
+        writer_compile_time_args = {src0_cb_index, single_page_size};
     }
     TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);
 

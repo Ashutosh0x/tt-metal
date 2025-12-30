@@ -53,10 +53,10 @@ ExampleMultipleReturnDeviceOperation::SingleCore::create(
             .set_page_size(output_cb_index, single_tile_size_output);
     tt::tt_metal::CreateCircularBuffer(program, all_cores, cb_output_config);
 
-    std::vector<uint32_t> reader_compile_time_args;
+    std::vector<uint32_t> reader_compile_time_args{single_tile_size};
     tt::tt_metal::TensorAccessorArgs(*src_buffer).append_to(reader_compile_time_args);
 
-    std::vector<uint32_t> writer_compile_time_args = {(std::uint32_t)output_cb_index};
+    std::vector<uint32_t> writer_compile_time_args = {output_cb_index, single_tile_size_output};
     tt::tt_metal::TensorAccessorArgs(output_tensor1.has_value() ? output_tensor1.value().buffer() : nullptr)
         .append_to(writer_compile_time_args);
     tt::tt_metal::TensorAccessorArgs(output_tensor2.has_value() ? output_tensor2.value().buffer() : nullptr)

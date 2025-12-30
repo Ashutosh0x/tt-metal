@@ -135,7 +135,7 @@ UntilizeWithUnpaddingSingleCoreProgramFactory::cached_program_t UntilizeWithUnpa
         block_row_size,
         block_row_leftover_size};
 
-    std::vector<uint32_t> reader_compile_time_args;
+    std::vector<uint32_t> reader_compile_time_args{input_single_tile_size};
     TensorAccessorArgs(*src0_buffer).append_to(reader_compile_time_args);
 
     std::vector<uint32_t> writer_compile_time_args = {

@@ -177,7 +177,7 @@ BinaryDeviceOperation::BroadcastHeightAndWidthMultiCore::create(
     if (output_sharded) {
         writer_defines["OUT_SHARDED"] = "1";
     }
-    std::vector<uint32_t> writer_compile_time_args = {cb_output};
+    std::vector<uint32_t> writer_compile_time_args = {cb_output, dst_single_tile_size};
     tt::tt_metal::TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);
     KernelHandle unary_writer_kernel_id = tt_metal::CreateKernel(
         program,

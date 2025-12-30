@@ -200,7 +200,8 @@ SliceTileProgramFactory::cached_program_t SliceTileProgramFactory::create(
     // Data is 32 byte aligned
     std::vector<uint32_t> reader_compile_time_args = {src0_cb_index, num_dims};
     TensorAccessorArgs(*src0_buffer).append_to(reader_compile_time_args);
-    std::vector<uint32_t> writer_compile_time_args = {src0_cb_index};
+
+    std::vector<uint32_t> writer_compile_time_args = {src0_cb_index, single_tile_size};
     TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);
 
     tt::tt_metal::KernelHandle unary_reader_kernel_id = tt::tt_metal::CreateKernel(

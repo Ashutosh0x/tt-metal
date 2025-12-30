@@ -229,7 +229,7 @@ EmbeddingsFusedProgramFactory::cached_program_t EmbeddingsFusedProgramFactory::c
     tt::tt_metal::KernelHandle writer_kernel_id = 0;
     // TODO: We can use the second risc to do more work in parallel
     if (!output_sharded) {
-        std::vector<uint32_t> writer_compile_time_args = {(std::uint32_t)output_cb_index};
+        std::vector<uint32_t> writer_compile_time_args = {output_cb_index, output_single_tile_size};
         tt::tt_metal::TensorAccessorArgs(*output.buffer()).append_to(writer_compile_time_args);
 
         // Tilized writer

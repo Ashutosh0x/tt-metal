@@ -95,7 +95,7 @@ UntilizeMultiCoreParallelizeColumnProgramFactory::create(
 
     Buffer* src0_buffer = a.buffer();
     Buffer* dst_buffer = output.buffer();
-    std::vector<uint32_t> reader_ct_args;
+    std::vector<uint32_t> reader_ct_args{input_single_tile_size};
     TensorAccessorArgs(*src0_buffer).append_to(reader_ct_args);
 
     auto unary_reader_kernel_id = CreateKernel(
