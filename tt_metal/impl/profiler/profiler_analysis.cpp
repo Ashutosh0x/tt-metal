@@ -106,7 +106,7 @@ experimental::DurationHistogram make_quantized_histogram_ns(
 
     for (uint32_t i = 0; i <= buckets; ++i) {
         hist.bucket_edges_ns[i] =
-            static_cast<uint64_t>(static_cast<__int128>(start) + static_cast<__int128>(bucket_size) * i);
+            static_cast<uint64_t>(static_cast<__int128>(start) + (static_cast<__int128>(bucket_size) * i));
     }
 
     for (uint64_t sample : samples_ns) {
