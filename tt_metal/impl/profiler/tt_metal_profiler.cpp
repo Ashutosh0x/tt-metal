@@ -10,6 +10,7 @@
 #include <mesh_command_queue.hpp>
 #include <tt_metal.hpp>
 #include <tt_metal_profiler.hpp>
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <cstdint>
@@ -22,6 +23,7 @@
 #include <ostream>
 #include <set>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <tuple>
 #include <unordered_map>
@@ -1046,6 +1048,156 @@ void ReadMeshDeviceProfilerResults(
 
 namespace experimental {
 
+namespace {
+
+constexpr std::string_view DEVICE_KERNEL_DURATION_KEY = "DEVICE KERNEL DURATION [ns]";
+
+// Choose a bucket size quantized to the nearest QUANTUM_NS, while still covering the full [min..max] span.
+uint64_t choose_quantized_bucket_size(uint64_t min_ns, uint64_t max_ns, uint32_t buckets, uint64_t quantum_ns) {
+    if (buckets == 0) {
+        return 1;
+    }
+    if (quantum_ns == 0) {
+        quantum_ns = 1;
+    }
+    if (max_ns < min_ns) {
+        std::swap(min_ns, max_ns);
+    }
+    const uint64_t span = max_ns - min_ns;
+    // Avoid zero and compute ceil(span / buckets).
+    const uint64_t needed = std::max<uint64_t>(1, (span + buckets - 1) / buckets);
+
+    // Round to nearest multiple of quantum (ties go up due to integer math).
+    const uint64_t rounded = ((needed + (quantum_ns / 2)) / quantum_ns) * quantum_ns;
+    uint64_t bucket_size = std::max<uint64_t>(quantum_ns, rounded);
+
+    // Never under-cover: if bucket_size*buckets < span, bump to ceil(needed/quantum)*quantum.
+    if (static_cast<__int128>(bucket_size) * static_cast<__int128>(buckets) < static_cast<__int128>(span)) {
+        bucket_size = ((needed + quantum_ns - 1) / quantum_ns) * quantum_ns;
+    }
+
+    return std::max<uint64_t>(1, bucket_size);
+}
+
+experimental::DurationHistogram make_quantized_histogram_ns(
+    const std::vector<uint64_t>& samples_ns, uint64_t min_ns, uint64_t max_ns, uint32_t buckets) {
+    experimental::DurationHistogram hist;
+    hist.num_buckets = buckets;
+
+    if (buckets == 0) {
+        return hist;
+    }
+
+    if (max_ns < min_ns) {
+        std::swap(min_ns, max_ns);
+    }
+    constexpr uint64_t BUCKET_QUANTUM_NS = 100;  // nearest multiple of 100ns
+    const uint64_t bucket_size = choose_quantized_bucket_size(min_ns, max_ns, buckets, BUCKET_QUANTUM_NS);
+    const uint64_t start = (min_ns / bucket_size) * bucket_size;
+    const uint64_t end =
+        static_cast<uint64_t>(static_cast<__int128>(start) + static_cast<__int128>(bucket_size) * buckets);
+
+    hist.min_ns = start;
+    hist.max_ns = end;
+
+    hist.bucket_edges_ns.resize(static_cast<size_t>(buckets) + 1);
+    hist.bucket_counts.assign(static_cast<size_t>(buckets), 0);
+
+    for (uint32_t i = 0; i <= buckets; ++i) {
+        hist.bucket_edges_ns[i] =
+            static_cast<uint64_t>(static_cast<__int128>(start) + static_cast<__int128>(bucket_size) * i);
+    }
+
+    for (uint64_t sample : samples_ns) {
+        if (sample < start) {
+            hist.underflow++;
+            continue;
+        }
+        if (sample >= end) {
+            hist.overflow++;
+            continue;
+        }
+        const uint64_t rel = sample - start;
+        size_t bucket_idx = static_cast<size_t>(rel / bucket_size);
+        if (bucket_idx >= hist.bucket_counts.size()) {
+            bucket_idx = hist.bucket_counts.size() - 1;
+        }
+        hist.bucket_counts[bucket_idx] += 1;
+    }
+
+    return hist;
+}
+
+experimental::KernelDurationSummary summarize_kernel_duration_for_program_set(
+    const std::set<experimental::ProgramAnalysisData>& perf_data,
+    uint64_t histogram_min_ns,
+    uint64_t histogram_max_ns,
+    uint32_t histogram_buckets) {
+    experimental::KernelDurationSummary summary;
+
+    std::vector<uint64_t> kernel_durations_ns;
+    kernel_durations_ns.reserve(perf_data.size());
+
+    for (const auto& program : perf_data) {
+        auto it = program.program_analyses_results.find(std::string(DEVICE_KERNEL_DURATION_KEY));
+        if (it == program.program_analyses_results.end()) {
+            continue;
+        }
+        const uint64_t duration_ns = it->second.duration;
+        if (duration_ns == 0) {
+            continue;
+        }
+        kernel_durations_ns.push_back(duration_ns);
+    }
+
+    if (!kernel_durations_ns.empty()) {
+        summary.count = kernel_durations_ns.size();
+        const auto [min_it, max_it] = std::minmax_element(kernel_durations_ns.begin(), kernel_durations_ns.end());
+        summary.min_ns = *min_it;
+        summary.max_ns = *max_it;
+
+        long double sum = 0.0L;
+        for (uint64_t v : kernel_durations_ns) {
+            sum += static_cast<long double>(v);
+        }
+        summary.avg_ns = static_cast<double>(sum / static_cast<long double>(summary.count));
+    }
+
+    // Histogram range:
+    // - By default (histogram_min_ns == 0 and histogram_max_ns == 0), span the observed [min..max].
+    // - If data is empty, use a conservative fallback.
+    constexpr uint64_t FALLBACK_MIN_NS = 100;
+    constexpr uint64_t FALLBACK_MAX_NS = 10'000'000;  // 10ms
+    uint64_t hist_min = histogram_min_ns;
+    uint64_t hist_max = histogram_max_ns;
+
+    if (hist_min == 0 && hist_max == 0) {
+        if (summary.count > 0) {
+            hist_min = summary.min_ns;
+            hist_max = summary.max_ns;
+        } else {
+            hist_min = FALLBACK_MIN_NS;
+            hist_max = FALLBACK_MAX_NS;
+        }
+    } else {
+        if (hist_min == 0) {
+            hist_min = summary.count > 0 ? summary.min_ns : FALLBACK_MIN_NS;
+        }
+        if (hist_max == 0) {
+            hist_max = summary.count > 0 ? summary.max_ns : FALLBACK_MAX_NS;
+        }
+    }
+    if (hist_max < hist_min) {
+        hist_max = hist_min;
+    }
+
+    summary.histogram = make_quantized_histogram_ns(kernel_durations_ns, hist_min, hist_max, histogram_buckets);
+
+    return summary;
+}
+
+}  // namespace
+
 std::map<ChipId, std::set<ProgramAnalysisData>> GetLatestProgramsPerfData() {
     std::map<ChipId, std::set<ProgramAnalysisData>> latest_programs_perf_data;
 #if defined(TRACY_ENABLE)
@@ -1107,6 +1259,28 @@ std::map<ChipId, std::set<ProgramAnalysisData>> GetAllProgramsPerfData() {
 
 #endif
     return all_programs_perf_data;
+}
+
+std::map<ChipId, KernelDurationSummary> GetLatestProgramsDeviceKernelDurationSummary(
+    uint64_t histogram_min_ns, uint64_t histogram_max_ns, uint32_t histogram_buckets) {
+    std::map<ChipId, KernelDurationSummary> summaries;
+    const auto perf_data = GetLatestProgramsPerfData();
+    for (const auto& [chip_id, program_set] : perf_data) {
+        summaries[chip_id] = summarize_kernel_duration_for_program_set(
+            program_set, histogram_min_ns, histogram_max_ns, histogram_buckets);
+    }
+    return summaries;
+}
+
+std::map<ChipId, KernelDurationSummary> GetAllProgramsDeviceKernelDurationSummary(
+    uint64_t histogram_min_ns, uint64_t histogram_max_ns, uint32_t histogram_buckets) {
+    std::map<ChipId, KernelDurationSummary> summaries;
+    const auto perf_data = GetAllProgramsPerfData();
+    for (const auto& [chip_id, program_set] : perf_data) {
+        summaries[chip_id] = summarize_kernel_duration_for_program_set(
+            program_set, histogram_min_ns, histogram_max_ns, histogram_buckets);
+    }
+    return summaries;
 }
 
 }  // namespace experimental

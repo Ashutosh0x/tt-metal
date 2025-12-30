@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <algorithm>
+#include <cmath>
 #include <string>
 #include <optional>
 #include <sstream>
@@ -341,6 +342,7 @@ void writeProgramsPerfResultsToCSV(
 
     std::map<experimental::ProgramExecutionUID, CsvRowData> rows_per_uid;
     std::map<ChipId, std::vector<experimental::ProgramExecutionUID>> device_to_programs;
+    std::map<ChipId, std::vector<uint64_t>> kernel_durations_ns_by_device;
 
     const auto get_analysis_index = [&](const std::string& analysis_name) -> std::optional<size_t> {
         for (size_t i = 0; i < programs_perf_results.analysis_results_configs.size(); ++i) {
@@ -401,24 +403,29 @@ void writeProgramsPerfResultsToCSV(
             }
 
             if (kernel_analysis_index.has_value() && i == kernel_analysis_index.value() &&
-                analysis_result != PROGRAM_INVALID_SINGLE_ANALYSIS_RESULT &&
-                analysis_config.display_start_and_end_timestamps) {
+                analysis_result != PROGRAM_INVALID_SINGLE_ANALYSIS_RESULT) {
                 row.kernel_duration_ns = analysis_result.duration;
-                row.kernel_start_cycle = analysis_result.start_timestamp;
-                row.kernel_end_cycle = analysis_result.end_timestamp;
+                if (analysis_config.display_start_and_end_timestamps) {
+                    row.kernel_start_cycle = analysis_result.start_timestamp;
+                    row.kernel_end_cycle = analysis_result.end_timestamp;
+                }
             }
             if (dm_analysis_index.has_value() && i == dm_analysis_index.value() &&
-                analysis_result != PROGRAM_INVALID_SINGLE_ANALYSIS_RESULT &&
-                analysis_config.display_start_and_end_timestamps) {
+                analysis_result != PROGRAM_INVALID_SINGLE_ANALYSIS_RESULT) {
                 row.dm_duration_ns = analysis_result.duration;
-                row.dm_start_cycle = analysis_result.start_timestamp;
-                row.dm_end_cycle = analysis_result.end_timestamp;
+                if (analysis_config.display_start_and_end_timestamps) {
+                    row.dm_start_cycle = analysis_result.start_timestamp;
+                    row.dm_end_cycle = analysis_result.end_timestamp;
+                }
             }
         }
 
         row.base_columns = row_stream.str();
         rows_per_uid.emplace(program_execution_uid, row);
         device_to_programs[row.device_id].push_back(program_execution_uid);
+        if (row.kernel_duration_ns.has_value() && row.kernel_duration_ns.value() > 0) {
+            kernel_durations_ns_by_device[row.device_id].push_back(row.kernel_duration_ns.value());
+        }
     }
 
     auto compute_latency = [](uint64_t start_cycle,
@@ -528,6 +535,135 @@ void writeProgramsPerfResultsToCSV(
     }
 
     log_file_ofs.close();
+
+    // Emit a compact stdout summary for kernel device time (useful for CI triage).
+    // Histogram buckets are log-spaced over the observed [min..max] for this dump.
+    constexpr uint32_t HIST_BUCKETS = 10;
+
+    auto choose_quantized_bucket_size =
+        [&](uint64_t min_ns, uint64_t max_ns, uint32_t buckets, uint64_t quantum_ns) -> uint64_t {
+        if (buckets == 0) {
+            return 1;
+        }
+        if (quantum_ns == 0) {
+            quantum_ns = 1;
+        }
+        if (max_ns < min_ns) {
+            std::swap(min_ns, max_ns);
+        }
+        const uint64_t span = max_ns - min_ns;
+        const uint64_t needed = std::max<uint64_t>(1, (span + buckets - 1) / buckets);  // ceil(span / buckets)
+
+        const uint64_t rounded = ((needed + (quantum_ns / 2)) / quantum_ns) * quantum_ns;
+        uint64_t bucket_size = std::max<uint64_t>(quantum_ns, rounded);
+
+        if (static_cast<__int128>(bucket_size) * static_cast<__int128>(buckets) < static_cast<__int128>(span)) {
+            bucket_size = ((needed + quantum_ns - 1) / quantum_ns) * quantum_ns;
+        }
+        return std::max<uint64_t>(1, bucket_size);
+    };
+
+    auto make_quantized_edges = [&](uint64_t min_ns, uint64_t max_ns, uint32_t buckets) -> std::vector<uint64_t> {
+        std::vector<uint64_t> edges;
+        if (buckets == 0) {
+            return edges;
+        }
+        if (max_ns < min_ns) {
+            std::swap(min_ns, max_ns);
+        }
+        constexpr uint64_t BUCKET_QUANTUM_NS = 100;  // nearest multiple of 100ns
+        const uint64_t bucket_size = choose_quantized_bucket_size(min_ns, max_ns, buckets, BUCKET_QUANTUM_NS);
+        const uint64_t start = (min_ns / bucket_size) * bucket_size;
+        edges.resize(static_cast<size_t>(buckets) + 1);
+        for (uint32_t i = 0; i <= buckets; ++i) {
+            edges[i] = static_cast<uint64_t>(static_cast<__int128>(start) + static_cast<__int128>(bucket_size) * i);
+        }
+        return edges;
+    };
+
+    auto print_summary = [&](ChipId device_id, const std::vector<uint64_t>& samples) {
+        if (samples.empty()) {
+            log_info(
+                tt::LogMetal,
+                "C++ perf summary (device={}): no '{}' samples found in this dump",
+                device_id,
+                "DEVICE KERNEL DURATION [ns]");
+            return;
+        }
+
+        const auto [min_it, max_it] = std::minmax_element(samples.begin(), samples.end());
+        const uint64_t min_ns = *min_it;
+        const uint64_t max_ns = *max_it;
+        long double sum = 0.0L;
+        for (uint64_t v : samples) {
+            sum += static_cast<long double>(v);
+        }
+        const double avg_ns = static_cast<double>(sum / static_cast<long double>(samples.size()));
+
+        log_info(
+            tt::LogMetal,
+            "C++ perf summary (device={}): DEVICE KERNEL DURATION [ns] count={}, min={}ns, avg={:.1f}ns, max={}ns",
+            device_id,
+            samples.size(),
+            min_ns,
+            avg_ns,
+            max_ns);
+
+        // Auto-range histogram to observed [min..max], with bucket size quantized to nearest 100ns.
+        const std::vector<uint64_t> edges = make_quantized_edges(min_ns, max_ns, HIST_BUCKETS);
+        std::vector<uint64_t> counts(HIST_BUCKETS, 0);
+        uint64_t underflow = 0;
+        uint64_t overflow = 0;
+
+        const uint64_t start = edges.front();
+        const uint64_t end = edges.back();
+        const uint64_t bucket_size = edges.size() >= 2 ? (edges[1] - edges[0]) : 1;
+
+        for (uint64_t v : samples) {
+            if (v < start) {
+                underflow++;
+                continue;
+            }
+            if (v >= end) {
+                overflow++;
+                continue;
+            }
+            size_t bucket_idx = static_cast<size_t>((v - start) / bucket_size);
+            if (bucket_idx >= counts.size()) {
+                bucket_idx = counts.size() - 1;
+            }
+            counts[bucket_idx]++;
+        }
+
+        std::string buckets_str;
+        for (size_t i = 0; i < counts.size(); ++i) {
+            const uint64_t lo = edges[i];
+            const uint64_t hi = edges[i + 1];
+            buckets_str += fmt::format("[{}..{}):{}", lo, hi, counts[i]);
+            if (i + 1 < counts.size()) {
+                buckets_str += " ";
+            }
+        }
+
+        log_info(
+            tt::LogMetal,
+            "C++ perf histogram (device={}, ns, buckets={} bucket_size={} range=[{}..{}]): {} | underflow(<{}ns)={} "
+            "overflow(>={}ns)={}",
+            device_id,
+            HIST_BUCKETS,
+            bucket_size,
+            start,
+            end,
+            buckets_str,
+            start,
+            underflow,
+            end,
+            overflow);
+    };
+
+    for (const auto& [device_id, samples] : kernel_durations_ns_by_device) {
+        print_summary(device_id, samples);
+    }
 }
 
 NLOHMANN_JSON_SERIALIZE_ENUM(
