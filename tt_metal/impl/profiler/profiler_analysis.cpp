@@ -576,7 +576,7 @@ void writeProgramsPerfResultsToCSV(
         const uint64_t start = (min_ns / bucket_size) * bucket_size;
         edges.resize(static_cast<size_t>(buckets) + 1);
         for (uint32_t i = 0; i <= buckets; ++i) {
-            edges[i] = static_cast<uint64_t>(static_cast<__int128>(start) + static_cast<__int128>(bucket_size) * i);
+            edges[i] = static_cast<uint64_t>(static_cast<__int128>(start) + (static_cast<__int128>(bucket_size) * i));
         }
         return edges;
     };
