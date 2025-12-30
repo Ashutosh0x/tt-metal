@@ -70,8 +70,10 @@ def test_eltwise_exp(device, num_tiles):
         format_descriptors=[out_cb_format],
     )
 
-    reader_compile_time_args = ttnn.TensorAccessorArgs(input_tensor).get_compile_time_args()
-    writer_compile_time_args = [out_cb]
+    reader_compile_time_args = [cb_page_size]
+    reader_compile_time_args.extend(ttnn.TensorAccessorArgs(input_tensor).get_compile_time_args())
+
+    writer_compile_time_args = [out_cb, cb_page_size]
     writer_compile_time_args.extend(ttnn.TensorAccessorArgs(output_tensor).get_compile_time_args())
     compute_compile_time_args = [work_per_core1, 1]
 

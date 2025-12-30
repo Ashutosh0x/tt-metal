@@ -309,7 +309,7 @@ TEST_F(TTNNFixtureWithDevice, TestGenericOpBinaryEltwiseAdd) {
     TensorAccessorArgs(*device_input_tensor_a.buffer()).append_to(reader_compile_time_args);
     TensorAccessorArgs(*device_input_tensor_b.buffer()).append_to(reader_compile_time_args);
 
-    KernelDescriptor::CompileTimeArgs writer_compile_time_args = {dst_cb_index};
+    KernelDescriptor::CompileTimeArgs writer_compile_time_args = {dst_cb_index, tt::tile_size(output_cb_data_format)};
     TensorAccessorArgs(*device_output_tensor.buffer()).append_to(writer_compile_time_args);
 
     // setup runtime arguments for data movement kernels
@@ -544,7 +544,7 @@ TEST_F(TTNNFixtureWithDevice, TestGenericOpMatmul) {
     TensorAccessorArgs(*src0_buffer).append_to(reader_compile_time_args);
     TensorAccessorArgs(*src1_buffer).append_to(reader_compile_time_args);
 
-    KernelDescriptor::CompileTimeArgs writer_compile_time_args = {(uint32_t)output_cb_index};
+    KernelDescriptor::CompileTimeArgs writer_compile_time_args = {(uint32_t)output_cb_index, output_single_tile_size};
     TensorAccessorArgs(*dst_buffer).append_to(writer_compile_time_args);
 
     log_info(tt::LogTest, "num_cores: {}, num_core_x: {}, num_core_y: {}", num_cores, num_cores_x, num_cores_y);
@@ -713,9 +713,9 @@ TEST_F(TTNNFixtureWithDevice, TestGenericOpEltwiseSFPU) {
         .format_descriptors = {output_cb_format_descriptor},
     };
 
-    KernelDescriptor::CompileTimeArgs reader_compile_time_args;
+    KernelDescriptor::CompileTimeArgs reader_compile_time_args = {tt::tile_size(input_cb_data_format)};
     TensorAccessorArgs(*device_input_tensor.buffer()).append_to(reader_compile_time_args);
-    KernelDescriptor::CompileTimeArgs writer_compile_time_args = {(std::uint32_t)cb_out_id};
+    KernelDescriptor::CompileTimeArgs writer_compile_time_args = {cb_out_id, tt::tile_size(input_cb_data_format)};
     TensorAccessorArgs(*device_output_tensor.buffer()).append_to(writer_compile_time_args);
 
     // only core (0, 0) is used
@@ -805,9 +805,10 @@ TEST_F(TTNNFixtureWithDevice, TestGenericOpProgramCache) {
         .format_descriptors = {{cb_out_id, input_cb_data_format, tt::tile_size(input_cb_data_format)}},
     };
 
-    KernelDescriptor::CompileTimeArgs reader_ct_args;
+    uint32_t data_size = tt::tile_size(input_cb_data_format);
+    KernelDescriptor::CompileTimeArgs reader_ct_args = {data_size};
     TensorAccessorArgs(*device_input_tensor_1.buffer()).append_to(reader_ct_args);
-    KernelDescriptor::CompileTimeArgs writer_ct_args = {(uint32_t)cb_out_id};
+    KernelDescriptor::CompileTimeArgs writer_ct_args = {cb_out_id, data_size};
     TensorAccessorArgs(*device_output_tensor_1.buffer()).append_to(writer_ct_args);
 
     ProgramDescriptor program_descriptor = {
