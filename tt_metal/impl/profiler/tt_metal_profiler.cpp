@@ -710,7 +710,6 @@ void InitDeviceProfiler(IDevice* device) {
     auto& profiler = profiler_state_manager->device_profiler_map.at(device_id);
     profiler.setLastFDReadAsNotDone();
     profiler.setProfileBufferBankSizeBytes(bank_size_bytes, num_dram_banks);
-    profiler.setProfileNumBuffersPerRisc(1);
 
     std::vector<uint32_t> control_buffer(kernel_profiler::PROFILER_L1_CONTROL_VECTOR_SIZE, 0);
     control_buffer[kernel_profiler::DRAM_PROFILER_ADDRESS_DEFAULT] = hal.get_dev_addr(HalDramMemAddrType::PROFILER);
@@ -722,7 +721,6 @@ void InitDeviceProfiler(IDevice* device) {
         control_buffer[kernel_profiler::DRAM_PROFILER_ADDRESS_T0_0] = hal.get_dev_addr(HalDramMemAddrType::PROFILER);
         control_buffer[kernel_profiler::DRAM_PROFILER_ADDRESS_T1_0] = hal.get_dev_addr(HalDramMemAddrType::PROFILER);
         control_buffer[kernel_profiler::DRAM_PROFILER_ADDRESS_T2_0] = hal.get_dev_addr(HalDramMemAddrType::PROFILER);
-        profiler.setProfileNumBuffersPerRisc(2);
     }
 
     setControlBuffer(device, control_buffer);
@@ -1162,7 +1160,6 @@ void LaunchIntervalBasedProfilerReadThread(const std::vector<IDevice*>& active_d
     std::unordered_map<ChipId, std::vector<CoreCoord>> virtual_cores_map;
     for (IDevice* device : active_devices) {
         virtual_cores_map[device->id()] = detail::getVirtualCoresForProfiling(device, ProfilerReadState::NORMAL);
-        ;
     }
 
     MetalContext::instance().profiler_state_manager()->start_debug_dump_thread(active_devices, virtual_cores_map);

@@ -152,6 +152,7 @@ void ProfilerStateManager::add_runtime_id_to_trace(ChipId device_id, uint32_t tr
 
 void ProfilerStateManager::start_debug_dump_thread(
     std::vector<IDevice*> active_devices, std::unordered_map<ChipId, std::vector<CoreCoord>> virtual_cores_map) {
+    TT_ASSERT(!this->debug_dump_thread.joinable());
     this->debug_dump_thread = std::thread([this,
                                            active_devices = std::move(active_devices),
                                            virtual_cores_map = std::move(virtual_cores_map)]() {
@@ -171,7 +172,6 @@ void ProfilerStateManager::start_debug_dump_thread(
             std::unique_lock<std::mutex> lock{this->debug_dump_thread_mutex};
             if (this->stop_debug_dump_thread_cv.wait_for(
                     lock, interval, [&] { return this->stop_debug_dump_thread.load(); })) {
-                log_info(tt::LogMetal, "Reading device profiler results during cleanup");
                 for (auto* device : active_devices) {
                     {
                         auto profiler_it = this->device_profiler_map.find(device->id());

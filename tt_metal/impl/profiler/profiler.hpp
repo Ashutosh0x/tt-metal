@@ -121,12 +121,6 @@ private:
     // Number of bytes reserved in each DRAM bank for storing device profiling data
     uint32_t profile_buffer_bank_size_bytes{};
 
-    // Number of buffers per risc. 1 or 2.
-    uint32_t profile_num_buffers_per_risc{};
-
-    // Effective number of bytes that can be used to store device profiling data
-    uint32_t profile_buffer_per_risc_size_bytes{};
-
     // Map which DRAM buffer is currently being written to by the RISC cores. Used for debug dump mode with double
     // buffering.
     std::map<CoreCoord, std::map<tracy::RiscType, uint8_t>> active_dram_buffer_per_core_risc_map;
@@ -316,10 +310,6 @@ public:
     uint32_t getProfileBufferBankSizeBytes() const;
 
     void setProfileBufferBankSizeBytes(uint32_t size, uint32_t num_dram_banks);
-
-    uint32_t getProfileNumBuffersPerRisc() const;
-
-    void setProfileNumBuffersPerRisc(uint32_t num_buffers);
 
     // Read control buffer for each core, check if the host buffer for any risc is full. If it's full,
     // swap the active DRAM buffer to unblock the risc and then read out the buffer

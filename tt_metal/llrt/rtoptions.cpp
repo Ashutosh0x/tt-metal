@@ -836,7 +836,9 @@ void RunTimeOptions::HandleEnvVar(EnvVarID id, const char* value) {
         // Default: false (debug dump mode disabled)
         // Usage: export TT_METAL_DEVICE_DEBUG_DUMP_ENABLED=1
         case EnvVarID::TT_METAL_DEVICE_DEBUG_DUMP_ENABLED: {
-            if (this->profiler_enabled && is_env_enabled(value)) {
+            if (is_env_enabled(value)) {
+                this->profiler_enabled = true;
+                this->profiler_noc_events_enabled = true;
                 this->experimental_device_debug_dump_enabled = true;
             }
             break;

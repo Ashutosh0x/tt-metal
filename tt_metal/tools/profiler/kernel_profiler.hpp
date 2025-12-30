@@ -153,15 +153,15 @@ inline __attribute__((always_inline)) uint32_t get_id(uint32_t id, PacketTypes t
 }
 
 template <DoingDispatch dispatch = DoingDispatch::NOT_DISPATCH>
-inline __attribute__((always_inline)) bool bufferHasRoom() {
+inline __attribute__((always_inline)) bool bufferHasRoom(uint32_t additional_slots = 0) {
     bool bufferHasRoom = false;
     if constexpr (dispatch == DoingDispatch::DISPATCH) {
-        bufferHasRoom = wIndex < (PROFILER_L1_VECTOR_SIZE - stackSize - DISPATCH_HEADROOM_SIZE);
+        bufferHasRoom = wIndex + additional_slots < (PROFILER_L1_VECTOR_SIZE - stackSize - DISPATCH_HEADROOM_SIZE);
     } else if constexpr (dispatch == DoingDispatch::DISPATCH_META) {
-        bufferHasRoom =
-            wIndex < (PROFILER_L1_VECTOR_SIZE - stackSize - (QUICK_PUSH_MARKER_COUNT * PROFILER_L1_MARKER_UINT32_SIZE));
+        bufferHasRoom = wIndex + additional_slots < (PROFILER_L1_VECTOR_SIZE - stackSize -
+                                                     (QUICK_PUSH_MARKER_COUNT * PROFILER_L1_MARKER_UINT32_SIZE));
     } else {
-        bufferHasRoom = wIndex < (PROFILER_L1_VECTOR_SIZE - stackSize);
+        bufferHasRoom = wIndex + additional_slots < (PROFILER_L1_VECTOR_SIZE - stackSize);
     }
     return bufferHasRoom;
 }
@@ -609,8 +609,8 @@ struct profileScopeAccumulate {
 
 // performs quick push to DRAM if buffers appear full
 template <DoingDispatch dispatch = DoingDispatch::NOT_DISPATCH>
-inline __attribute__((always_inline)) void flush_to_dram_if_full() {
-    if (not bufferHasRoom<dispatch>()) {
+inline __attribute__((always_inline)) void flush_to_dram_if_full(uint32_t additional_slots = 0) {
+    if (not bufferHasRoom<dispatch>(additional_slots)) {
         quick_push();
     }
 }
