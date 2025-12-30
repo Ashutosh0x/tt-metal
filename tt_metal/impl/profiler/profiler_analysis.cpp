@@ -55,6 +55,82 @@ NLOHMANN_JSON_SERIALIZE_ENUM(
 
 namespace tt::tt_metal {
 
+namespace detail {
+
+static uint64_t choose_quantized_bucket_size(uint64_t min_ns, uint64_t max_ns, uint32_t buckets, uint64_t quantum_ns) {
+    if (buckets == 0) {
+        return 1;
+    }
+    if (quantum_ns == 0) {
+        quantum_ns = 1;
+    }
+    if (max_ns < min_ns) {
+        std::swap(min_ns, max_ns);
+    }
+    const uint64_t span = max_ns - min_ns;
+    const uint64_t needed = std::max<uint64_t>(1, (span + buckets - 1) / buckets);  // ceil(span / buckets)
+
+    const uint64_t rounded = ((needed + (quantum_ns / 2)) / quantum_ns) * quantum_ns;
+    uint64_t bucket_size = std::max<uint64_t>(quantum_ns, rounded);
+
+    if (static_cast<__int128>(bucket_size) * static_cast<__int128>(buckets) < static_cast<__int128>(span)) {
+        bucket_size = ((needed + quantum_ns - 1) / quantum_ns) * quantum_ns;
+    }
+
+    return std::max<uint64_t>(1, bucket_size);
+}
+
+experimental::DurationHistogram make_quantized_histogram_ns(
+    const std::vector<uint64_t>& samples_ns, uint64_t min_ns, uint64_t max_ns, uint32_t buckets, uint64_t quantum_ns) {
+    experimental::DurationHistogram hist;
+    hist.num_buckets = buckets;
+
+    if (buckets == 0) {
+        return hist;
+    }
+
+    if (max_ns < min_ns) {
+        std::swap(min_ns, max_ns);
+    }
+
+    const uint64_t bucket_size = choose_quantized_bucket_size(min_ns, max_ns, buckets, quantum_ns);
+    const uint64_t start = (min_ns / bucket_size) * bucket_size;
+    const uint64_t end =
+        static_cast<uint64_t>(static_cast<__int128>(start) + static_cast<__int128>(bucket_size) * buckets);
+
+    hist.min_ns = start;
+    hist.max_ns = end;
+
+    hist.bucket_edges_ns.resize(static_cast<size_t>(buckets) + 1);
+    hist.bucket_counts.assign(static_cast<size_t>(buckets), 0);
+
+    for (uint32_t i = 0; i <= buckets; ++i) {
+        hist.bucket_edges_ns[i] =
+            static_cast<uint64_t>(static_cast<__int128>(start) + static_cast<__int128>(bucket_size) * i);
+    }
+
+    for (uint64_t sample : samples_ns) {
+        if (sample < start) {
+            hist.underflow++;
+            continue;
+        }
+        if (sample >= end) {
+            hist.overflow++;
+            continue;
+        }
+        const uint64_t rel = sample - start;
+        size_t bucket_idx = static_cast<size_t>(rel / bucket_size);
+        if (bucket_idx >= hist.bucket_counts.size()) {
+            bucket_idx = hist.bucket_counts.size() - 1;
+        }
+        hist.bucket_counts[bucket_idx] += 1;
+    }
+
+    return hist;
+}
+
+}  // namespace detail
+
 // INVALID_NUM_PROGRAM_EXECUTION_UID and INVALID_NUM must be equal to ensure proper translation between TTDeviceMarker
 // IDs and ProgramExecutionUID. INVALID_NUM cannot be used directly because ProgramExecutionUID is exposed in the public
 // API, and INVALID_NUM is declared in the Tracy submodule which should not be exposed.
@@ -537,49 +613,8 @@ void writeProgramsPerfResultsToCSV(
     log_file_ofs.close();
 
     // Emit a compact stdout summary for kernel device time (useful for CI triage).
-    // Histogram buckets are uniformly-spaced over the observed [min..max] for this dump.
+    // Histogram buckets are uniform-width with bucket size quantized to nearest 100ns and spanning observed min..max.
     constexpr uint32_t HIST_BUCKETS = 10;
-
-    auto choose_quantized_bucket_size =
-        [&](uint64_t min_ns, uint64_t max_ns, uint32_t buckets, uint64_t quantum_ns) -> uint64_t {
-        if (buckets == 0) {
-            return 1;
-        }
-        if (quantum_ns == 0) {
-            quantum_ns = 1;
-        }
-        if (max_ns < min_ns) {
-            std::swap(min_ns, max_ns);
-        }
-        const uint64_t span = max_ns - min_ns;
-        const uint64_t needed = std::max<uint64_t>(1, (span + buckets - 1) / buckets);  // ceil(span / buckets)
-
-        const uint64_t rounded = ((needed + (quantum_ns / 2)) / quantum_ns) * quantum_ns;
-        uint64_t bucket_size = std::max<uint64_t>(quantum_ns, rounded);
-
-        if (static_cast<__int128>(bucket_size) * static_cast<__int128>(buckets) < static_cast<__int128>(span)) {
-            bucket_size = ((needed + quantum_ns - 1) / quantum_ns) * quantum_ns;
-        }
-        return std::max<uint64_t>(1, bucket_size);
-    };
-
-    auto make_quantized_edges = [&](uint64_t min_ns, uint64_t max_ns, uint32_t buckets) -> std::vector<uint64_t> {
-        std::vector<uint64_t> edges;
-        if (buckets == 0) {
-            return edges;
-        }
-        if (max_ns < min_ns) {
-            std::swap(min_ns, max_ns);
-        }
-        constexpr uint64_t BUCKET_QUANTUM_NS = 100;  // nearest multiple of 100ns
-        const uint64_t bucket_size = choose_quantized_bucket_size(min_ns, max_ns, buckets, BUCKET_QUANTUM_NS);
-        const uint64_t start = (min_ns / bucket_size) * bucket_size;
-        edges.resize(static_cast<size_t>(buckets) + 1);
-        for (uint32_t i = 0; i <= buckets; ++i) {
-            edges[i] = static_cast<uint64_t>(static_cast<__int128>(start) + (static_cast<__int128>(bucket_size) * i));
-        }
-        return edges;
-    };
 
     auto print_summary = [&](ChipId device_id, const std::vector<uint64_t>& samples) {
         if (samples.empty()) {
@@ -609,31 +644,16 @@ void writeProgramsPerfResultsToCSV(
             avg_ns,
             max_ns);
 
-        // Auto-range histogram to observed [min..max], with bucket size quantized to nearest 100ns.
-        const std::vector<uint64_t> edges = make_quantized_edges(min_ns, max_ns, HIST_BUCKETS);
-        std::vector<uint64_t> counts(HIST_BUCKETS, 0);
-        uint64_t underflow = 0;
-        uint64_t overflow = 0;
+        const experimental::DurationHistogram hist =
+            detail::make_quantized_histogram_ns(samples, min_ns, max_ns, HIST_BUCKETS, /*quantum_ns=*/100);
+        const std::vector<uint64_t>& edges = hist.bucket_edges_ns;
+        const std::vector<uint64_t>& counts = hist.bucket_counts;
+        const uint64_t underflow = hist.underflow;
+        const uint64_t overflow = hist.overflow;
 
-        const uint64_t start = edges.front();
-        const uint64_t end = edges.back();
+        const uint64_t start = hist.min_ns;
+        const uint64_t end = hist.max_ns;
         const uint64_t bucket_size = edges.size() >= 2 ? (edges[1] - edges[0]) : 1;
-
-        for (uint64_t v : samples) {
-            if (v < start) {
-                underflow++;
-                continue;
-            }
-            if (v >= end) {
-                overflow++;
-                continue;
-            }
-            size_t bucket_idx = static_cast<size_t>((v - start) / bucket_size);
-            if (bucket_idx >= counts.size()) {
-                bucket_idx = counts.size() - 1;
-            }
-            counts[bucket_idx]++;
-        }
 
         // Render ASCII histogram.
         constexpr size_t BAR_WIDTH = 40;
