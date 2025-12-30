@@ -138,10 +138,6 @@ void MAIN {
     // runtime args are used while for grid sample the max out sticks is set
     uint32_t num_out_sticks_this_core = max_out_sticks_per_core ? max_out_sticks_per_core : get_arg_val<uint32_t>(0);
 
-    DPRINT << "num_out_sticks_this_core: " << num_out_sticks_this_core << ENDL();
-    DPRINT << "in_nblocks_c: " << in_nblocks_c << ENDL();
-    DPRINT << "interm_reduction_chunks: " << interm_reduction_chunks << ENDL();
-
     uint32_t tilize_stick_counter = 0;
     uint32_t tilize_stick_total = 0;
     bool first_iteration = true;
@@ -176,19 +172,16 @@ void MAIN {
                 cb_pop_front(compute_tmp_idx_cb_id, 1);
             }
             if constexpr (is_large_kernel) {
-                copy_dest_values_init();
-                copy_dest_values(index_dst_idx, index_temp_dst_idx);  // save base indices for this C block
-
                 // clear the accumulation tiles since they will contain garbage data which is partially loaded
                 // since max SFPU offset if 62 DST rows, but 4 rows are loaded each time so we load 2 rows of
                 // DST tiles 1 and 3 during the reduction of tiles 0 and 2
                 copy_tile_to_dst_init_short(clear_value_cb_id);
                 reconfig_data_format_srca(clear_value_cb_id);
                 copy_tile(clear_value_cb_id, mpwi_cb_tile_idx, data_accum_dst_idx);
-                copy_tile(
-                    clear_value_cb_id,
-                    mpwi_cb_tile_idx,
-                    index_accum_dst_idx);  // TODO probably don't need to clear indexes
+
+                // make a copy of the initial indexes to be used for restoring between C blocks
+                copy_dest_values_init();
+                copy_dest_values(index_temp_dst_idx, index_dst_idx);
             }
 
             for (uint32_t chunk = 0; chunk < interm_reduction_chunks; chunk++) {
@@ -245,16 +238,14 @@ void MAIN {
                     }
                 }
 
-                if (!increment_needed) {
-                    // no increment needed, just copy back the original indexes - copy_dest_values does not work
-                    copy_tile_to_dst_init_short(zero_inc_cb_id);
-                    reconfig_data_format_srca(zero_inc_cb_id);
-                    copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
+                if (increment_needed) {
+                    // we allow overflow here for negative values as this only occurs in padding regions
+                    add_int_tile_init();
+                    add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
+                } else {
+                    copy_dest_values_init();
+                    copy_dest_values(index_scratch_out_dst_idx, index_dst_idx);
                 }
-
-                // we allow overflow here for negative values as this only occurs in padding regions
-                add_int_tile_init();
-                add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
 
                 // the max_reduce_with_indices LLK function only supports kernel_size=9, pending
                 // https://github.com/tenstorrent/tt-metal/issues/28141 but, since for return_indices the in_cb is
@@ -262,25 +253,16 @@ void MAIN {
                 // the data movement kernel, it is possible to still use max_reduce_with_indices with kernel sizes
                 // smaller than 9 as the excess sticks are just filled with padding values
                 constexpr uint32_t max_mpwi_kernel_size = window_size_hw <= 9 ? 9 : 32;
-                // TODO update SFPU to do DST accumulation
                 // TODO use 9 stick version for large kernel if chunk size allows
-
-                MATH(DPRINT << "Before MPWI:" << ENDL());
-                dprint_tensix_dest_reg(0);
-                MATH(DPRINT << "--" << ENDL());
 
                 max_reduce_with_indices_init<ckernel::DataLayout::ROW_MAJOR>();
                 max_reduce_with_indices<max_mpwi_kernel_size, ckernel::DataLayout::ROW_MAJOR, is_large_kernel>(
                     data_dst_idx, index_dst_idx, chunk);
 
-                MATH(DPRINT << "After MPWI:" << ENDL());
-                dprint_tensix_dest_reg(0);
-                MATH(DPRINT << "--" << ENDL());
-
                 if constexpr (is_large_kernel) {
                     if (!last_chunk) {
                         copy_dest_values_init();
-                        copy_dest_values(index_scratch_out_dst_idx, index_dst_idx);
+                        copy_dest_values(index_dst_idx, index_scratch_out_dst_idx);
                     }
                 }
 
@@ -292,7 +274,7 @@ void MAIN {
                 if (!last_c_block) {
                     copy_dest_values_init();
                     copy_dest_values(
-                        index_temp_dst_idx, index_scratch_out_dst_idx);  // restore base indices for next C block
+                        index_scratch_out_dst_idx, index_temp_dst_idx);  // restore base indices for next C block
                 }
             }
 
