@@ -50,7 +50,8 @@ static std::vector<Tensor> pool2d_invoke(
     bool reallocate_halo_output = true,
     bool return_indices = false,
     const DataType dtype = DataType::BFLOAT16,
-    const Layout output_layout = Layout::ROW_MAJOR) {
+    const Layout output_layout = Layout::ROW_MAJOR,
+    bool config_tensor_in_dram = false) {
     std::array<uint32_t, 4> padding_4d = sliding_window::get_pair_n4_padding(padding);
     bool is_out_tiled = output_layout == Layout::TILE;
     bool is_in_tiled = input_tensor.layout() == ttnn::TILE_LAYOUT;
@@ -253,7 +254,8 @@ static std::vector<Tensor> pool2d_invoke(
         false,
         parallel_config.shard_orientation == ShardOrientation::COL_MAJOR,
         input_tensor_sharded.memory_config(),
-        is_out_tiled);
+        is_out_tiled,
+        config_tensor_in_dram);
 
     if (deallocate_input || is_input_tensor_in_dram) {
         input_tensor_sharded.deallocate(/*force*/ true);
@@ -280,7 +282,8 @@ static std::vector<Tensor> pool2d_invoke(
         count_include_pad,
         divisor_override,
         return_indices,
-        pre_allocate_size);
+        pre_allocate_size,
+        config_tensor_in_dram);
 
     // format and return the result
     if (memory_config.has_value() && memory_config.value() != out_memory_config) {
@@ -318,7 +321,8 @@ std::vector<Tensor> MaxPool2DOp::invoke(
     bool reallocate_halo_output,
     bool return_indices,
     const DataType dtype,
-    const Layout output_layout) {
+    const Layout output_layout,
+    bool config_tensor_in_dram) {
     return pool2d_invoke(
         input_tensor,
         Pool2DType::MAX_POOL2D,
@@ -340,7 +344,8 @@ std::vector<Tensor> MaxPool2DOp::invoke(
         reallocate_halo_output,
         return_indices,
         dtype,
-        output_layout);
+        output_layout,
+        config_tensor_in_dram);
 }
 
 Tensor AvgPool2DOp::invoke(
@@ -361,7 +366,8 @@ Tensor AvgPool2DOp::invoke(
     bool deallocate_input,
     bool reallocate_halo_output,
     const DataType dtype,
-    const Layout output_layout) {
+    const Layout output_layout,
+    bool config_tensor_in_dram) {
     auto result = pool2d_invoke(
         input_tensor,
         Pool2DType::AVG_POOL2D,
@@ -383,7 +389,8 @@ Tensor AvgPool2DOp::invoke(
         reallocate_halo_output,
         false,  // return_indices
         dtype,
-        output_layout);
+        output_layout,
+        config_tensor_in_dram);
 
     // Average pool always returns just the tensor, never indices
     return result.at(0);
