@@ -182,8 +182,13 @@ void MAIN {
                 copy_tile(clear_value_cb_id, mpwi_cb_tile_idx, data_accum_dst_idx);
 
                 // make a copy of the initial indexes to be used for restoring between C blocks
-                // copy_dest_values_init();
-                // copy_dest_values(index_temp_dst_idx, index_dst_idx);
+                // we just need to do copy_dest_values(index_temp_dst_idx, index_dst_idx); but
+                // copy_dest_values doesn't work for uint16 so we use add_uint16 with zero
+                copy_tile_to_dst_init_short(zero_inc_cb_id);
+                reconfig_data_format_srca(zero_inc_cb_id);
+                copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
+                add_int_tile_init();
+                add_uint16_tile(index_dst_idx, inc_dst_idx, index_temp_dst_idx);
             }
 
             for (uint32_t chunk = 0; chunk < interm_reduction_chunks; chunk++) {
@@ -287,13 +292,17 @@ void MAIN {
             }
 
             // After all chunks: if not last C block, restore base indices for next C block
-            // if constexpr (is_large_kernel) {
-            //     if (!last_c_block) {
-            //         copy_dest_values_init();
-            //         copy_dest_values(
-            //             index_scratch_out_dst_idx, index_temp_dst_idx);  // restore base indices for next C block
-            //     }
-            // }
+            if constexpr (is_large_kernel) {
+                if (!last_c_block) {
+                    // we just need to do copy_dest_values(index_scratch_out_dst_idx, index_temp_dst_idx); but
+                    // copy_dest_values doesn't work for uint16 so we use add_uint16 with zero
+                    copy_tile_to_dst_init_short(zero_inc_cb_id);
+                    reconfig_data_format_srca(zero_inc_cb_id);
+                    copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
+                    add_int_tile_init();
+                    add_uint16_tile(index_temp_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
+                }
+            }
 
             tile_regs_commit();
             tile_regs_wait();
