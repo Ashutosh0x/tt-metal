@@ -645,7 +645,7 @@ void writeProgramsPerfResultsToCSV(
             max_ns);
 
         const experimental::DurationHistogram hist =
-            detail::make_quantized_histogram_ns(samples, min_ns, max_ns, HIST_BUCKETS, /*quantum_ns=*/100);
+            detail::make_quantized_histogram_ns(samples, min_ns, max_ns, HIST_BUCKETS);
         const std::vector<uint64_t>& edges = hist.bucket_edges_ns;
         const std::vector<uint64_t>& counts = hist.bucket_counts;
         const uint64_t underflow = hist.underflow;

@@ -1114,8 +1114,8 @@ experimental::KernelDurationSummary summarize_kernel_duration_for_program_set(
     }
     hist_max = std::max(hist_max, hist_min);
 
-    summary.histogram = tt::tt_metal::detail::make_quantized_histogram_ns(
-        kernel_durations_ns, hist_min, hist_max, histogram_buckets, 100);
+    summary.histogram =
+        tt::tt_metal::detail::make_quantized_histogram_ns(kernel_durations_ns, hist_min, hist_max, histogram_buckets);
 
     return summary;
 }
