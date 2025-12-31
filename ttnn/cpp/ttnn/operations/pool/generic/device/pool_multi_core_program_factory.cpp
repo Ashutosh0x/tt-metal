@@ -430,8 +430,8 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
     uint16_t right_inc = 0;
     uint16_t down_left_wrap_inc = 0;
     uint16_t up_left_wrap_inc = 0;
-    uint32_t intra_kernel_right_inc = 0;
-    uint32_t intra_kernel_down_left_wrap_inc = 0;
+    uint16_t intra_kernel_right_inc = 0;
+    uint16_t intra_kernel_down_left_wrap_inc = 0;
     if (return_indices) {
         uint32_t tile_elems = tt::constants::TILE_WIDTH * tt::constants::TILE_HEIGHT;
         in_idx_cb_id = next_cb_index++;
@@ -509,20 +509,32 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
             // this means we process multiple top left positions within the kernel for a single top left position in the
             // tensor, so when we move the kernel to a new position in the tensor we need to subtract the difference
             // between the first top left index in the kernel and the last one
-            uint32_t sticks_per_chunk =
+            uint16_t sticks_per_chunk =
                 kernel_w <= params.max_rows_for_reduction ? kernel_w : params.max_rows_for_reduction;
-            uint32_t w_chunks =
+            uint16_t w_chunks =
                 kernel_w % sticks_per_chunk == 0 ? kernel_w / sticks_per_chunk : kernel_w / sticks_per_chunk + 1;
-            uint32_t last_w_chunk_w_offset = (w_chunks - 1) * sticks_per_chunk * dilation_w;
-            uint32_t first_top_left_kernel_index = 0;
-            uint32_t last_top_left_kernel_index = (kernel_h - 1) * dilation_h * in_w + last_w_chunk_w_offset;
-            uint32_t index_correction = last_top_left_kernel_index - first_top_left_kernel_index;
+            uint16_t last_w_chunk_w_offset = (w_chunks - 1) * sticks_per_chunk * dilation_w;
+            uint16_t first_top_left_kernel_index = 0;
+            uint16_t last_top_left_kernel_index = (kernel_h - 1) * dilation_h * in_w + last_w_chunk_w_offset;
+            uint16_t index_correction = last_top_left_kernel_index - first_top_left_kernel_index;
             right_inc -= index_correction;
             down_left_wrap_inc -= index_correction;
             up_left_wrap_inc -= index_correction;
 
             intra_kernel_right_inc = dilation_w * sticks_per_chunk;
             intra_kernel_down_left_wrap_inc = dilation_h * in_w - last_w_chunk_w_offset;
+        }
+
+        printf(
+            "righht inc: %d, down left wrap inc: %d, up left wrap inc: %d\n",
+            right_inc,
+            down_left_wrap_inc,
+            up_left_wrap_inc);
+        if (params.is_large_kernel) {
+            printf(
+                "intra kernel right inc: %d, intra kernel down left wrap inc: %d\n",
+                intra_kernel_right_inc,
+                intra_kernel_down_left_wrap_inc);
         }
     }
 

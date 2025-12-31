@@ -127,7 +127,7 @@ from tests.sweep_framework.sweep_utils.max_pool2d_with_indices_common import run
         # Contains following parameters
         # [batch_size, input_channels, input_height, input_width, kernel_height, kernel_width, stride_h, stride_w, pad_h, pad_w, dilation_h, dilation_w, ceil_mode]
         # DILATION / MULTI-BATCH CASES
-        [1, 32, 8, 8, 8, 8, 1, 1, 0, 0, 1, 1, False],
+        [1, 32, 18, 18, 8, 8, 1, 1, 0, 0, 1, 1, False],
         # [2, 40, 100, 100, 3, 3, 2, 2, 0, 1, 2, 2, True],
         # [3, 56, 85, 85, 3, 3, 3, 3, 1, 0, 2, 2, False],
         # [4, 24, 56, 64, 3, 3, 2, 1, 1, 1, 3, 2, True],

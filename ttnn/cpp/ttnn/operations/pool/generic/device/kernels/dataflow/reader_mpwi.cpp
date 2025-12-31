@@ -90,6 +90,7 @@ template <
     uint32_t dilation_h,
     uint32_t dilation_w,
     bool is_large_kernel,
+    uint32_t sticks_per_chunk,
     uint16_t right_inc,
     uint16_t down_left_wrap_inc,
     uint16_t up_left_wrap_inc,
@@ -120,6 +121,8 @@ ALWI void initialize_return_indices_data() {
     const uint16_t start_row = (uint16_t)get_arg_val<uint32_t>(1);
     const uint16_t start_col = (uint16_t)get_arg_val<uint32_t>(2);
 
+    DPRINT << "start_row: " << start_row << ", start_col: " << start_col << ENDL();
+
     if (start_row <= pad_t) {
         // top left is in top padding, we increment from the padding index in the top left
         // of the padded tensor
@@ -145,9 +148,12 @@ ALWI void initialize_return_indices_data() {
     for (uint32_t h = 0; h < kernel_h; ++h) {
         for (uint32_t w = 0; w < kernel_w; ++w) {
             uint16_t hw = h * kernel_w + w;
-            for (uint32_t c = 0; c < fill_c; ++c) {
-                uint16_t index = init_index + kernel_idx;
-                idx_ptr[hw * TILE_WIDTH + c] = index;
+            if (!is_large_kernel || hw < sticks_per_chunk) {
+                // only fill up to sticks_per_chunk for large kernels
+                for (uint32_t c = 0; c < fill_c; ++c) {
+                    uint16_t index = init_index + kernel_idx;
+                    idx_ptr[hw * TILE_WIDTH + c] = index;
+                }
             }
             kernel_idx += dilation_w;
         }
@@ -204,7 +210,7 @@ template <
     uint32_t in_w_padded,
     uint32_t in_nbytes_leftover,
     uint32_t in_c,
-    uint32_t max_sticks_for_reduction,
+    uint32_t sticks_per_chunk,
     uint32_t total_elems_to_reduce,
     bool wide_reduction,
     uint32_t clear_value_cb_id,
@@ -232,7 +238,6 @@ ALWI void read_kernel_with_top_left_index(uint32_t ind, uint32_t in_l1_read_base
     uint32_t max_write_inc = wide_reduction ? MAX_BYTES_PER_REDUCTION : in_nbytes_leftover;
     static_assert(MAX_TILES_PER_REDUCTION == 1, "MAX_TILES_PER_REDUCTION must be 1 for return indices");
     max_write_inc = TILE_WIDTH * BYTES_PER_ELEM;
-    constexpr uint32_t sticks_per_chunk = kernel_w <= max_sticks_for_reduction ? kernel_w : max_sticks_for_reduction;
     for (uint32_t c_i = 0; c_i < in_nblocks_c; c_i++) {
         uint32_t read_bytes = in_nbytes_c;
         if constexpr (wide_reduction) {
@@ -424,6 +429,7 @@ void kernel_main() {
     constexpr uint32_t face_r_dim = FACE_HEIGHT;
     constexpr uint32_t num_faces_in_input_tile = 4;
     constexpr bool is_large_kernel = window_size_hw > max_sticks_for_reduction;
+    constexpr uint32_t sticks_per_chunk = kernel_w <= max_sticks_for_reduction ? kernel_w : max_sticks_for_reduction;
     constexpr bool wide_reduction = in_nblocks_c > 1;
     // we only need to initialize the in_cb if we will not fill each reduction chunk with valid data
     // and MPWI compute uses the clear value CB to initialize DST 1 and 3 (the accumulation tiles) for large kernels
@@ -450,6 +456,7 @@ void kernel_main() {
             dilation_h,
             dilation_w,
             is_large_kernel,
+            sticks_per_chunk,
             right_inc,
             down_left_wrap_inc,
             up_left_wrap_inc,
@@ -509,7 +516,7 @@ void kernel_main() {
                 in_w_padded,
                 in_nbytes_leftover,
                 in_c,
-                max_sticks_for_reduction,
+                sticks_per_chunk,
                 total_elems_to_reduce,
                 wide_reduction,
                 clear_value_cb_id,

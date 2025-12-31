@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: © 2024 Tenstorrent AI ULC
 // SPDX-License-Identifier: Apache-2.0
 
+#include <cfloat>
 #include <cstdint>
 
 #include "compute_kernel_api/pack_untilize.h"
@@ -142,6 +143,7 @@ void MAIN {
     uint32_t tilize_stick_total = 0;
     bool first_iteration = true;
     for (uint32_t n = 0; n < num_out_sticks_this_core; ++n) {
+        MATH(DPRINT << "##OUTPUT STICK " << n << " ---------------------" << ENDL());
         const uint32_t curr_scalar_cb_id = in_scalar_cb_id_0;
         const uint32_t curr_in_cb_id = in_cb_id_0;
         for (uint32_t c_i = 0; c_i < in_nblocks_c; c_i++) {
@@ -180,11 +182,12 @@ void MAIN {
                 copy_tile(clear_value_cb_id, mpwi_cb_tile_idx, data_accum_dst_idx);
 
                 // make a copy of the initial indexes to be used for restoring between C blocks
-                copy_dest_values_init();
-                copy_dest_values(index_temp_dst_idx, index_dst_idx);
+                // copy_dest_values_init();
+                // copy_dest_values(index_temp_dst_idx, index_dst_idx);
             }
 
             for (uint32_t chunk = 0; chunk < interm_reduction_chunks; chunk++) {
+                MATH(DPRINT << "--CHUNK " << chunk << "---------------------" << ENDL());
                 bool first_chunk = chunk == 0;
                 bool last_chunk = chunk == interm_reduction_chunks - 1;
 
@@ -204,11 +207,13 @@ void MAIN {
                         if (current_idx_row + stride_h + eff_kernel_h > in_h_padded) {
                             // we reached the bottom right corner, wrap to the top and to the left
                             current_idx_row = 0;
+                            MATH(DPRINT << "up_left_wrap_inc" << ENDL());
                             copy_tile_to_dst_init_short(up_left_wrap_inc_cb_id);
                             reconfig_data_format_srca(up_left_wrap_inc_cb_id);
                             copy_tile(up_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {
                             current_idx_row += stride_h;
+                            MATH(DPRINT << "down_left_wrap_inc" << ENDL());
                             copy_tile_to_dst_init_short(down_left_wrap_inc_cb_id);
                             reconfig_data_format_srca(down_left_wrap_inc_cb_id);
                             copy_tile(down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
@@ -216,6 +221,7 @@ void MAIN {
                     } else {
                         // we are still in the same row, move to the right
                         current_idx_col += stride_w;
+                        MATH(DPRINT << "right_inc" << ENDL());
                         copy_tile_to_dst_init_short(right_inc_cb_id);
                         reconfig_data_format_srca(right_inc_cb_id);
                         copy_tile(right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
@@ -225,12 +231,14 @@ void MAIN {
                         increment_needed = true;
                         if (intra_kernel_w + sticks_per_chunk < kernel_w) {  // move right in this row
                             intra_kernel_w += sticks_per_chunk;
+                            MATH(DPRINT << "intra_kernel_right" << ENDL());
                             copy_tile_to_dst_init_short(intra_kernel_right_inc_cb_id);
                             reconfig_data_format_srca(intra_kernel_right_inc_cb_id);
                             copy_tile(intra_kernel_right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {  // move down to the next row
                             intra_kernel_w = 0;
                             intra_kernel_h += 1;
+                            MATH(DPRINT << "intra_kernel_down_left_wrap" << ENDL());
                             copy_tile_to_dst_init_short(intra_kernel_down_left_wrap_inc_cb_id);
                             reconfig_data_format_srca(intra_kernel_down_left_wrap_inc_cb_id);
                             copy_tile(intra_kernel_down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
@@ -241,6 +249,7 @@ void MAIN {
                 // TODO use copy_dest_values here, but currently this causes data type issues with multiple C blocks
                 if (!increment_needed) {
                     // no increment needed, just copy back the original indexes - copy_dest_values does not work
+                    MATH(DPRINT << "no_increment_needed" << ENDL());
                     copy_tile_to_dst_init_short(zero_inc_cb_id);
                     reconfig_data_format_srca(zero_inc_cb_id);
                     copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
@@ -264,8 +273,13 @@ void MAIN {
 
                 if constexpr (is_large_kernel) {
                     if (!last_chunk) {
-                        copy_dest_values_init();
-                        copy_dest_values(index_dst_idx, index_scratch_out_dst_idx);
+                        // we just need to do copy_dest_values(index_dst_idx, index_scratch_out_dst_idx); but
+                        // copy_dest_values doesn't work for uint16 so we use add_uint16 with zero
+                        copy_tile_to_dst_init_short(zero_inc_cb_id);
+                        reconfig_data_format_srca(zero_inc_cb_id);
+                        copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
+                        add_int_tile_init();
+                        add_uint16_tile(index_scratch_out_dst_idx, inc_dst_idx, index_dst_idx);
                     }
                 }
 
@@ -273,13 +287,13 @@ void MAIN {
             }
 
             // After all chunks: if not last C block, restore base indices for next C block
-            if constexpr (is_large_kernel) {
-                if (!last_c_block) {
-                    copy_dest_values_init();
-                    copy_dest_values(
-                        index_scratch_out_dst_idx, index_temp_dst_idx);  // restore base indices for next C block
-                }
-            }
+            // if constexpr (is_large_kernel) {
+            //     if (!last_c_block) {
+            //         copy_dest_values_init();
+            //         copy_dest_values(
+            //             index_scratch_out_dst_idx, index_temp_dst_idx);  // restore base indices for next C block
+            //     }
+            // }
 
             tile_regs_commit();
             tile_regs_wait();
