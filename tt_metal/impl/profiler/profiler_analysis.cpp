@@ -620,7 +620,7 @@ void writeProgramsPerfResultsToCSV(
         if (samples.empty()) {
             log_info(
                 tt::LogMetal,
-                "C++ perf summary (device={}): no '{}' samples found in this dump",
+                "Device kernel duration perf summary (device={}): no '{}' samples found in this dump",
                 device_id,
                 "DEVICE KERNEL DURATION [ns]");
             return;
@@ -637,7 +637,7 @@ void writeProgramsPerfResultsToCSV(
 
         log_info(
             tt::LogMetal,
-            "C++ perf summary (device={}): DEVICE KERNEL DURATION [ns] count={}, min={}ns, avg={:.1f}ns, max={}ns",
+            "Device kernel duration perf summary (device={}): count={}, min={}ns, avg={:.1f}ns, max={}ns",
             device_id,
             samples.size(),
             min_ns,
@@ -674,7 +674,7 @@ void writeProgramsPerfResultsToCSV(
 
         log_info(
             tt::LogMetal,
-            "C++ perf histogram (device={}): DEVICE KERNEL DURATION [ns] (buckets={}, bucket_size={}ns, "
+            "Device kernel duration perf histogram (device={}): (buckets={}, bucket_size={}ns, "
             "range=[{}..{}), "
             "underflow(<{}ns)={}, overflow(>={}ns)={})",
             device_id,
