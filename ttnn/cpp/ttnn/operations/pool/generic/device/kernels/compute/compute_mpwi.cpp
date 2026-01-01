@@ -179,12 +179,7 @@ void MAIN {
                 copy_tile(clear_value_cb_id, mpwi_cb_tile_idx, data_accum_dst_idx);
 
                 // make a copy of the initial indexes to be used for restoring between C blocks
-                // we just need to do copy_dest_values(index_temp_dst_idx, index_dst_idx); but
-                // copy_dest_values doesn't work for uint16 so we use add_uint16 with zero
-                reconfig_data_format_srca(zero_inc_cb_id);
-                copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
-                add_int_tile_init();
-                add_uint16_tile(index_dst_idx, inc_dst_idx, index_temp_dst_idx);
+                copy_dest_values_uint16(index_temp_dst_idx, index_dst_idx);
             }
 
             for (uint32_t chunk = 0; chunk < interm_reduction_chunks; chunk++) {
@@ -234,17 +229,13 @@ void MAIN {
                         }
                     }
                 }
-
-                // TODO use copy_dest_values here, but currently this causes data type issues with multiple C blocks
                 if (!increment_needed) {
-                    // no increment needed, just copy back the original indexes - copy_dest_values does not work
-                    reconfig_data_format_srca(zero_inc_cb_id);
-                    copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
+                    copy_dest_values_uint16(index_scratch_out_dst_idx, index_dst_idx);
+                } else {
+                    // we allow overflow here for negative values as this only occurs in padding regions
+                    add_int_tile_init();
+                    add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
                 }
-
-                // we allow overflow here for negative values as this only occurs in padding regions
-                add_int_tile_init();
-                add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
 
                 // the max_reduce_with_indices LLK function only supports kernel_size=9, pending
                 // https://github.com/tenstorrent/tt-metal/issues/28141 but, since for return_indices the in_cb is
@@ -260,12 +251,7 @@ void MAIN {
 
                 if constexpr (is_large_kernel) {
                     if (!last_chunk) {
-                        // we just need to do copy_dest_values(index_dst_idx, index_scratch_out_dst_idx); but
-                        // copy_dest_values doesn't work for uint16 so we use add_uint16 with zero
-                        reconfig_data_format_srca(zero_inc_cb_id);
-                        copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
-                        add_int_tile_init();
-                        add_uint16_tile(index_scratch_out_dst_idx, inc_dst_idx, index_dst_idx);
+                        copy_dest_values_uint16(index_dst_idx, index_scratch_out_dst_idx);
                     }
                 }
 
@@ -275,12 +261,7 @@ void MAIN {
             // After all chunks: if not last C block, restore base indices for next C block
             if constexpr (is_large_kernel) {
                 if (!last_c_block) {
-                    // we just need to do copy_dest_values(index_scratch_out_dst_idx, index_temp_dst_idx); but
-                    // copy_dest_values doesn't work for uint16 so we use add_uint16 with zero
-                    reconfig_data_format_srca(zero_inc_cb_id);
-                    copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
-                    add_int_tile_init();
-                    add_uint16_tile(index_temp_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
+                    copy_dest_values_uint16(index_scratch_out_dst_idx, index_temp_dst_idx);
                 }
             }
 
