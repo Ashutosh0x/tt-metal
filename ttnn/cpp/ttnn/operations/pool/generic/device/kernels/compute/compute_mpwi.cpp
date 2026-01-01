@@ -72,10 +72,9 @@ void MAIN {
     constexpr uint32_t intra_kernel_right_inc_cb_id = get_compile_time_arg_val(31);
     constexpr uint32_t intra_kernel_down_left_wrap_inc_cb_id = get_compile_time_arg_val(32);
     constexpr uint32_t compute_tmp_idx_cb_id = get_compile_time_arg_val(33);
-    constexpr uint32_t zero_inc_cb_id = get_compile_time_arg_val(34);
-    constexpr uint32_t kernel_h = get_compile_time_arg_val(35);
-    constexpr uint32_t kernel_w = get_compile_time_arg_val(36);
-    constexpr uint32_t clear_value_cb_id = get_compile_time_arg_val(37);
+    constexpr uint32_t kernel_h = get_compile_time_arg_val(34);
+    constexpr uint32_t kernel_w = get_compile_time_arg_val(35);
+    constexpr uint32_t clear_value_cb_id = get_compile_time_arg_val(36);
 
     constexpr uint32_t mpwi_cb_tile_idx = 0;
     constexpr uint32_t data_dst_idx = 0;
@@ -85,7 +84,6 @@ void MAIN {
     constexpr uint32_t inc_dst_idx = 4;
     constexpr uint32_t index_scratch_out_dst_idx = 6;
     constexpr uint32_t index_temp_dst_idx = 5;  // only used for large kernels
-    constexpr uint32_t zero_dst_idx = 7;
 
     constexpr uint32_t face_r_dim = FACE_HEIGHT;
     constexpr bool last_tile_is_partial = in_c % TILE_WIDTH != 0;
@@ -124,7 +122,6 @@ void MAIN {
     cb_wait_front(right_inc_cb_id, 1);
     cb_wait_front(down_left_wrap_inc_cb_id, 1);
     cb_wait_front(up_left_wrap_inc_cb_id, 1);
-    cb_wait_front(zero_inc_cb_id, 1);
     if (is_large_kernel) {
         cb_wait_front(intra_kernel_right_inc_cb_id, 1);
         cb_wait_front(intra_kernel_down_left_wrap_inc_cb_id, 1);
@@ -153,22 +150,15 @@ void MAIN {
             tile_regs_acquire();
             uint32_t intra_kernel_h = 0;
             uint32_t intra_kernel_w = 0;
-            if (first_iteration) {
+            reconfig_data_format_srca(compute_tmp_idx_cb_id);
+            if (first_iteration) {  // move the initial indexes from the reader to DST
                 cb_wait_front(in_idx_cb_id, 1);
-                reconfig_data_format_srca(in_idx_cb_id);
-                // UNPACK(tt::compute::common::print_full_tile(in_idx_cb_id));
-                copy_tile(
-                    in_idx_cb_id, mpwi_cb_tile_idx, index_dst_idx);  // move the initial indexes from the reader to DST
+                copy_tile(in_idx_cb_id, mpwi_cb_tile_idx, index_dst_idx);
                 cb_pop_front(in_idx_cb_id, 1);
                 first_iteration = false;
-            } else {
+            } else {  // move incremented indexes from compute back to DST
                 cb_wait_front(compute_tmp_idx_cb_id, 1);
-                reconfig_data_format_srca(compute_tmp_idx_cb_id);
-                // UNPACK(tt::compute::common::print_full_tile(compute_tmp_idx_cb_id));
-                copy_tile(
-                    compute_tmp_idx_cb_id,
-                    mpwi_cb_tile_idx,
-                    index_dst_idx);  // move incremented indexes from compute back to DST
+                copy_tile(compute_tmp_idx_cb_id, mpwi_cb_tile_idx, index_dst_idx);
                 cb_pop_front(compute_tmp_idx_cb_id, 1);
             }
             if constexpr (is_large_kernel) {
@@ -194,6 +184,7 @@ void MAIN {
                 bool increment_needed = false;
                 if (last_c_block && last_chunk) {  // increment for the next kernel position
                     increment_needed = true;
+                    reconfig_data_format_srca(compute_tmp_idx_cb_id);
                     // update the current index column
                     if (current_idx_col + stride_w + eff_kernel_w > in_w_padded) {
                         // we reached the right edge, wrap down and to the left
@@ -201,30 +192,26 @@ void MAIN {
                         if (current_idx_row + stride_h + eff_kernel_h > in_h_padded) {
                             // we reached the bottom right corner, wrap to the top and to the left
                             current_idx_row = 0;
-                            reconfig_data_format_srca(up_left_wrap_inc_cb_id);
                             copy_tile(up_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {
                             current_idx_row += stride_h;
-                            reconfig_data_format_srca(down_left_wrap_inc_cb_id);
                             copy_tile(down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         }
                     } else {
                         // we are still in the same row, move to the right
                         current_idx_col += stride_w;
-                        reconfig_data_format_srca(right_inc_cb_id);
                         copy_tile(right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                     }
                 } else if (is_large_kernel) {  // only need to increment within C block if multiple chunks
                     if (!last_chunk) {         // increment for the next chunk within the same C block
                         increment_needed = true;
+                        reconfig_data_format_srca(compute_tmp_idx_cb_id);
                         if (intra_kernel_w + sticks_per_chunk < kernel_w) {  // move right in this row
                             intra_kernel_w += sticks_per_chunk;
-                            reconfig_data_format_srca(intra_kernel_right_inc_cb_id);
                             copy_tile(intra_kernel_right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {  // move down to the next row
                             intra_kernel_w = 0;
                             intra_kernel_h += 1;
-                            reconfig_data_format_srca(intra_kernel_down_left_wrap_inc_cb_id);
                             copy_tile(intra_kernel_down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         }
                     }
@@ -235,6 +222,7 @@ void MAIN {
                     // we allow overflow here for negative values as this only occurs in padding regions
                     add_int_tile_init();
                     add_uint16_tile(index_dst_idx, inc_dst_idx, index_scratch_out_dst_idx);
+                    max_reduce_with_indices_init<ckernel::DataLayout::ROW_MAJOR>();
                 }
 
                 // the max_reduce_with_indices LLK function only supports kernel_size=9, pending
@@ -242,10 +230,8 @@ void MAIN {
                 // oversized (equal to 1 tile), and since this CB is filled with padding values in the beginning of
                 // the data movement kernel, it is possible to still use max_reduce_with_indices with kernel sizes
                 // smaller than 9 as the excess sticks are just filled with padding values
+                // TODO implement accumulation for <=9 MPWI SFPU so we can use this version for large kernels as well
                 constexpr uint32_t max_mpwi_kernel_size = window_size_hw <= 9 ? 9 : 32;
-                // TODO use 9 stick version for large kernel if chunk size allows
-
-                max_reduce_with_indices_init<ckernel::DataLayout::ROW_MAJOR>();
                 max_reduce_with_indices<max_mpwi_kernel_size, ckernel::DataLayout::ROW_MAJOR, is_large_kernel>(
                     data_dst_idx, index_dst_idx, chunk);
 
@@ -280,6 +266,7 @@ void MAIN {
 
             // Only push to compute_tmp_idx_cb_id if there's a next iteration that will consume it
             // This prevents leaving stale data in the CB between program runs when using caching
+            // TODO is this necessary for caching issues?
             bool is_last_iteration = (n == num_out_sticks_this_core - 1) && last_c_block;
             if (!is_last_iteration) {
                 cb_reserve_back(compute_tmp_idx_cb_id, 1);
@@ -293,6 +280,17 @@ void MAIN {
 
             tile_regs_release();
         }
+    }
+
+    // TODO is this necessary for caching issues?
+    cb_pop_front(in_scalar_cb_id_0, 1);
+    cb_pop_front(right_inc_cb_id, 1);
+    cb_pop_front(down_left_wrap_inc_cb_id, 1);
+    cb_pop_front(up_left_wrap_inc_cb_id, 1);
+    if (is_large_kernel) {
+        cb_pop_front(intra_kernel_right_inc_cb_id, 1);
+        cb_pop_front(intra_kernel_down_left_wrap_inc_cb_id, 1);
+        cb_pop_front(clear_value_cb_id, 1);
     }
 }
 

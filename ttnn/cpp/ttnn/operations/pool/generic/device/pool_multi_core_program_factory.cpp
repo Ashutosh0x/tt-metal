@@ -426,7 +426,6 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
     uint32_t intra_kernel_right_inc_cb_id = 32;
     uint32_t intra_kernel_down_left_wrap_inc_cb_id = 32;
     uint32_t compute_tmp_idx_cb_id = 32;
-    uint32_t zero_inc_cb_id = 32;
     uint16_t right_inc = 0;
     uint16_t down_left_wrap_inc = 0;
     uint16_t up_left_wrap_inc = 0;
@@ -463,13 +462,7 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
             compute_tmp_idx_cb_id, program, all_cores, params.index_nbytes * tile_elems, 1, params.index_format);
         log_debug(tt::LogOp, "CB {} :: PS = {}, NP = {}", compute_tmp_idx_cb_id, params.index_nbytes * tile_elems, 1);
 
-        zero_inc_cb_id = next_cb_index++;
-        tt::tt_metal::create_cb(
-            zero_inc_cb_id, program, all_cores, params.index_nbytes * tile_elems, 1, params.index_format);
-        log_debug(tt::LogOp, "CB {} :: PS = {}, NP = {}", zero_inc_cb_id, params.index_nbytes * tile_elems, 1);
-
         // compute increments for index tile population
-        printf("in_w: %d, out_w: %d\n", in_w, out_w);
         right_inc = stride_w;
         down_left_wrap_inc = in_w * stride_h + (1 - out_w) * stride_w;
         up_left_wrap_inc =
@@ -524,18 +517,6 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
 
             intra_kernel_right_inc = dilation_w * sticks_per_chunk;
             intra_kernel_down_left_wrap_inc = dilation_h * in_w - last_w_chunk_w_offset;
-        }
-
-        printf(
-            "righht inc: %d, down left wrap inc: %d, up left wrap inc: %d\n",
-            right_inc,
-            down_left_wrap_inc,
-            up_left_wrap_inc);
-        if (params.is_large_kernel) {
-            printf(
-                "intra kernel right inc: %d, intra kernel down left wrap inc: %d\n",
-                intra_kernel_right_inc,
-                intra_kernel_down_left_wrap_inc);
         }
     }
 
@@ -707,7 +688,6 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
         intra_kernel_down_left_wrap_inc,        // 47
         intra_kernel_right_inc_cb_id,           // 48
         intra_kernel_down_left_wrap_inc_cb_id,  // 49
-        zero_inc_cb_id                          // 50
     };
 
     std::vector<uint32_t> reader1_ct_args = reader0_ct_args;
@@ -771,10 +751,9 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
         intra_kernel_right_inc_cb_id,           // 31
         intra_kernel_down_left_wrap_inc_cb_id,  // 32
         compute_tmp_idx_cb_id,                  // 33
-        zero_inc_cb_id,                         // 34
-        kernel_h,                               // 35
-        kernel_w,                               // 36
-        clear_value_cb_id                       // 37
+        kernel_h,                               // 34
+        kernel_w,                               // 35
+        clear_value_cb_id                       // 36
     };
 
     // Get device arch for compute kernel config initialization
@@ -942,7 +921,6 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
          .intra_kernel_right_inc_cb = intra_kernel_right_inc_cb_id,
          .intra_kernel_down_left_wrap_inc_cb = intra_kernel_down_left_wrap_inc_cb_id,
          .compute_tmp_idx_cb = compute_tmp_idx_cb_id,
-         .zero_inc_cb = zero_inc_cb_id,
          .ncores = ncores,
          .reader_indices_storage = reader_indices_storage,
          .scalar_config_storage = scalar_config_storage}};
@@ -992,8 +970,6 @@ Pool2D::MultiCore::cached_program_t Pool2D::MultiCore::create(
     auto dilation_h = sliding_window_config.dilation_hw.first;
     auto dilation_w = sliding_window_config.dilation_hw.second;
     auto num_shards_c = sliding_window_config.num_cores_c;
-
-    printf("ceil_pad_h: %d, ceil_pad_w: %d\n", ceil_pad_h, ceil_pad_w);
 
     std::vector<uint32_t> op_trace_metadata =
         ttnn::operations::sliding_window::generate_op_trace_metadata(sliding_window_config);
