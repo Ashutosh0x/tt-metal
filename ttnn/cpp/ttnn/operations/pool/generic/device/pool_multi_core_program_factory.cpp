@@ -469,6 +469,7 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
         log_debug(tt::LogOp, "CB {} :: PS = {}, NP = {}", zero_inc_cb_id, params.index_nbytes * tile_elems, 1);
 
         // compute increments for index tile population
+        printf("in_w: %d, out_w: %d\n", in_w, out_w);
         right_inc = stride_w;
         down_left_wrap_inc = in_w * stride_h + (1 - out_w) * stride_w;
         up_left_wrap_inc =
@@ -991,6 +992,8 @@ Pool2D::MultiCore::cached_program_t Pool2D::MultiCore::create(
     auto dilation_h = sliding_window_config.dilation_hw.first;
     auto dilation_w = sliding_window_config.dilation_hw.second;
     auto num_shards_c = sliding_window_config.num_cores_c;
+
+    printf("ceil_pad_h: %d, ceil_pad_w: %d\n", ceil_pad_h, ceil_pad_w);
 
     std::vector<uint32_t> op_trace_metadata =
         ttnn::operations::sliding_window::generate_op_trace_metadata(sliding_window_config);

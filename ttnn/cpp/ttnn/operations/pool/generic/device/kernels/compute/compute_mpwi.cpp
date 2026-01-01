@@ -132,6 +132,7 @@ void MAIN {
     }
 
     unary_op_init_common(in_cb_id_0, in_cb_id_0);
+    copy_tile_to_dst_init_short(in_cb_id_0);
     max_reduce_with_indices_init<ckernel::DataLayout::ROW_MAJOR>();
 
     // if max out sticks is non-zero then this will be used as the number of out sticks for every core
@@ -143,7 +144,6 @@ void MAIN {
     uint32_t tilize_stick_total = 0;
     bool first_iteration = true;
     for (uint32_t n = 0; n < num_out_sticks_this_core; ++n) {
-        MATH(DPRINT << "##OUTPUT STICK " << n << " ---------------------" << ENDL());
         const uint32_t curr_scalar_cb_id = in_scalar_cb_id_0;
         const uint32_t curr_in_cb_id = in_cb_id_0;
         for (uint32_t c_i = 0; c_i < in_nblocks_c; c_i++) {
@@ -155,7 +155,6 @@ void MAIN {
             uint32_t intra_kernel_w = 0;
             if (first_iteration) {
                 cb_wait_front(in_idx_cb_id, 1);
-                copy_tile_to_dst_init_short(in_idx_cb_id);
                 reconfig_data_format_srca(in_idx_cb_id);
                 // UNPACK(tt::compute::common::print_full_tile(in_idx_cb_id));
                 copy_tile(
@@ -164,7 +163,6 @@ void MAIN {
                 first_iteration = false;
             } else {
                 cb_wait_front(compute_tmp_idx_cb_id, 1);
-                copy_tile_to_dst_init_short(compute_tmp_idx_cb_id);
                 reconfig_data_format_srca(compute_tmp_idx_cb_id);
                 // UNPACK(tt::compute::common::print_full_tile(compute_tmp_idx_cb_id));
                 copy_tile(
@@ -177,14 +175,12 @@ void MAIN {
                 // clear the accumulation tiles since they will contain garbage data which is partially loaded
                 // since max SFPU offset if 62 DST rows, but 4 rows are loaded each time so we load 2 rows of
                 // DST tiles 1 and 3 during the reduction of tiles 0 and 2
-                copy_tile_to_dst_init_short(clear_value_cb_id);
                 reconfig_data_format_srca(clear_value_cb_id);
                 copy_tile(clear_value_cb_id, mpwi_cb_tile_idx, data_accum_dst_idx);
 
                 // make a copy of the initial indexes to be used for restoring between C blocks
                 // we just need to do copy_dest_values(index_temp_dst_idx, index_dst_idx); but
                 // copy_dest_values doesn't work for uint16 so we use add_uint16 with zero
-                copy_tile_to_dst_init_short(zero_inc_cb_id);
                 reconfig_data_format_srca(zero_inc_cb_id);
                 copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                 add_int_tile_init();
@@ -192,12 +188,10 @@ void MAIN {
             }
 
             for (uint32_t chunk = 0; chunk < interm_reduction_chunks; chunk++) {
-                MATH(DPRINT << "--CHUNK " << chunk << "---------------------" << ENDL());
                 bool first_chunk = chunk == 0;
                 bool last_chunk = chunk == interm_reduction_chunks - 1;
 
                 cb_wait_front(curr_in_cb_id, 1);
-                copy_tile_to_dst_init_short(curr_in_cb_id);
                 reconfig_data_format_srca(curr_in_cb_id);
                 copy_tile(curr_in_cb_id, mpwi_cb_tile_idx, data_dst_idx);
 
@@ -212,22 +206,16 @@ void MAIN {
                         if (current_idx_row + stride_h + eff_kernel_h > in_h_padded) {
                             // we reached the bottom right corner, wrap to the top and to the left
                             current_idx_row = 0;
-                            MATH(DPRINT << "up_left_wrap_inc" << ENDL());
-                            copy_tile_to_dst_init_short(up_left_wrap_inc_cb_id);
                             reconfig_data_format_srca(up_left_wrap_inc_cb_id);
                             copy_tile(up_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {
                             current_idx_row += stride_h;
-                            MATH(DPRINT << "down_left_wrap_inc" << ENDL());
-                            copy_tile_to_dst_init_short(down_left_wrap_inc_cb_id);
                             reconfig_data_format_srca(down_left_wrap_inc_cb_id);
                             copy_tile(down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         }
                     } else {
                         // we are still in the same row, move to the right
                         current_idx_col += stride_w;
-                        MATH(DPRINT << "right_inc" << ENDL());
-                        copy_tile_to_dst_init_short(right_inc_cb_id);
                         reconfig_data_format_srca(right_inc_cb_id);
                         copy_tile(right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                     }
@@ -236,15 +224,11 @@ void MAIN {
                         increment_needed = true;
                         if (intra_kernel_w + sticks_per_chunk < kernel_w) {  // move right in this row
                             intra_kernel_w += sticks_per_chunk;
-                            MATH(DPRINT << "intra_kernel_right" << ENDL());
-                            copy_tile_to_dst_init_short(intra_kernel_right_inc_cb_id);
                             reconfig_data_format_srca(intra_kernel_right_inc_cb_id);
                             copy_tile(intra_kernel_right_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         } else {  // move down to the next row
                             intra_kernel_w = 0;
                             intra_kernel_h += 1;
-                            MATH(DPRINT << "intra_kernel_down_left_wrap" << ENDL());
-                            copy_tile_to_dst_init_short(intra_kernel_down_left_wrap_inc_cb_id);
                             reconfig_data_format_srca(intra_kernel_down_left_wrap_inc_cb_id);
                             copy_tile(intra_kernel_down_left_wrap_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         }
@@ -254,8 +238,6 @@ void MAIN {
                 // TODO use copy_dest_values here, but currently this causes data type issues with multiple C blocks
                 if (!increment_needed) {
                     // no increment needed, just copy back the original indexes - copy_dest_values does not work
-                    MATH(DPRINT << "no_increment_needed" << ENDL());
-                    copy_tile_to_dst_init_short(zero_inc_cb_id);
                     reconfig_data_format_srca(zero_inc_cb_id);
                     copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                 }
@@ -280,7 +262,6 @@ void MAIN {
                     if (!last_chunk) {
                         // we just need to do copy_dest_values(index_dst_idx, index_scratch_out_dst_idx); but
                         // copy_dest_values doesn't work for uint16 so we use add_uint16 with zero
-                        copy_tile_to_dst_init_short(zero_inc_cb_id);
                         reconfig_data_format_srca(zero_inc_cb_id);
                         copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                         add_int_tile_init();
@@ -296,7 +277,6 @@ void MAIN {
                 if (!last_c_block) {
                     // we just need to do copy_dest_values(index_scratch_out_dst_idx, index_temp_dst_idx); but
                     // copy_dest_values doesn't work for uint16 so we use add_uint16 with zero
-                    copy_tile_to_dst_init_short(zero_inc_cb_id);
                     reconfig_data_format_srca(zero_inc_cb_id);
                     copy_tile(zero_inc_cb_id, mpwi_cb_tile_idx, inc_dst_idx);
                     add_int_tile_init();
@@ -323,7 +303,6 @@ void MAIN {
             if (!is_last_iteration) {
                 cb_reserve_back(compute_tmp_idx_cb_id, 1);
                 pack_reconfig_data_format(compute_tmp_idx_cb_id);
-                // dprint_tensix_dest_reg(index_scratch_out_dst_idx);
                 pack_tile<true>(
                     index_scratch_out_dst_idx,
                     compute_tmp_idx_cb_id,

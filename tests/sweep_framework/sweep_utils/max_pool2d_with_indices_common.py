@@ -234,9 +234,6 @@ def run_max_pool2d_with_indices(
     ttnn_output_reshaped = ttnn_output_torch.reshape(in_n, out_h, out_w, in_c)
     ttnn_indices_reshaped = ttnn_indices_torch.reshape(in_n, out_h, out_w, in_c)
 
-    print(ttnn_indices_reshaped.flatten())
-    print(torch_indices_reshaped.flatten())
-
     atol, rtol = torch.testing._comparison.default_tolerances(torch.bfloat16)
     if ttnn_dtype == ttnn.bfloat8_b:
         atol = 0.35

@@ -121,8 +121,6 @@ ALWI void initialize_return_indices_data() {
     const uint16_t start_row = (uint16_t)get_arg_val<uint32_t>(1);
     const uint16_t start_col = (uint16_t)get_arg_val<uint32_t>(2);
 
-    DPRINT << "start_row: " << start_row << ", start_col: " << start_col << ENDL();
-
     if (start_row <= pad_t) {
         // top left is in top padding, we increment from the padding index in the top left
         // of the padded tensor
@@ -250,7 +248,6 @@ ALWI void read_kernel_with_top_left_index(uint32_t ind, uint32_t in_l1_read_base
             in_l1_write_addr = get_write_ptr(in_cb_id);
             cb_reserve_back(in_cb_id, 1);
         }
-        uint32_t processed_sticks = 0;
         // page zeroing is only necessary for tiled block output format so that scale is not affected by
         // junk/padding data
         if constexpr (zero_pages && reader_id == 0) {
@@ -259,7 +256,8 @@ ALWI void read_kernel_with_top_left_index(uint32_t ind, uint32_t in_l1_read_base
             }
         }
         for (uint32_t h = 0; h < kernel_h; ++h) {
-            auto process_h = [&](uint32_t w_offset, uint32_t w_multiple) __attribute__((always_inline)) {
+            auto process_h = [&](uint32_t w, uint32_t w_multiple) __attribute__((always_inline)) {
+                uint32_t w_offset = w * dilation_w;
                 if constexpr (reader_id == 0) {
                     const uint32_t stick_offset = ind + w_offset + h * dilation_h * in_w_padded;
                     const uint32_t read_offset =
@@ -267,18 +265,19 @@ ALWI void read_kernel_with_top_left_index(uint32_t ind, uint32_t in_l1_read_base
                     noc_async_read_one_packet(get_noc_addr(read_offset), in_l1_write_addr, read_bytes * w_multiple);
                     in_l1_write_addr += max_write_inc * w_multiple;
                 }
-                processed_sticks += w_multiple;
-                if ((is_large_kernel && (processed_sticks % sticks_per_chunk == 0)) ||
-                    processed_sticks == total_elems_to_reduce) {
+                bool kernel_complete = h == kernel_h - 1 && w == kernel_w - 1;
+                bool push_chunk =
+                    kernel_complete || (is_large_kernel && ((w + 1) % sticks_per_chunk == 0 || w == (kernel_w - 1)));
+                if (push_chunk) {
                     if constexpr (reader_id == 0) {  // push a chunk
                         noc_async_read_barrier();
                         cb_push_back(in_cb_id, 1);
-                        if (!(processed_sticks == total_elems_to_reduce)) {
+                        if (!kernel_complete) {
                             cb_reserve_back(in_cb_id, 1);
                             in_l1_write_addr = get_write_ptr(in_cb_id);
                         }
                     } else {
-                        if (processed_sticks == total_elems_to_reduce) {  // write output once all chunks are done
+                        if (kernel_complete) {  // write output once all chunks are done
                             constexpr uint32_t num_faces_in_output_tile = 2;
                             constexpr uint32_t num_faces_in_last_output_tile =
                                 last_tile_is_partial && in_c % TILE_WIDTH <= FACE_WIDTH ? 1 : 2;
@@ -313,7 +312,7 @@ ALWI void read_kernel_with_top_left_index(uint32_t ind, uint32_t in_l1_read_base
 
             // TODO - contiguous reads for some cases
             for (uint32_t w = 0; w < kernel_w; ++w) {
-                process_h(w * dilation_w, 1);
+                process_h(w, 1);
             }
         }
     }
