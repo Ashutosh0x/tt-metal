@@ -610,7 +610,7 @@ template <
     ckernel::DataLayout layout = ckernel::DataLayout::TILE,
     bool accumulate = false,
     int ITERATIONS = 8>
-ALWI void max_reduce_with_indices(uint32_t idst, uint32_t idst_idx, uint32_t chunk) {
+ALWI void max_reduce_with_indices(uint32_t idst, uint32_t idst_idx, uint32_t chunk = 0) {
     static_assert(num_rows <= 32, "num_rows must be <= 32");
     MATH((llk_math_eltwise_binary_sfpu_max_pool_with_indices<
           true,
