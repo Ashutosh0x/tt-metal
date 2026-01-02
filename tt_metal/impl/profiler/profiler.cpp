@@ -2129,18 +2129,13 @@ void DeviceProfiler::dumpDeviceResults(bool is_mid_run_dump) {
         this->generateAnalysesForDeviceMarkers(device_markers_vec);
     }
 
-    if (!is_mid_run_dump || !getDeviceDebugDumpEnabled()) {
-        this->thread_pool->enqueue([this]() { writeDeviceResultsToFiles(); });
-    }
+    this->thread_pool->enqueue([this]() { writeDeviceResultsToFiles(); });
 
     this->pushTracyDeviceResults(device_markers_vec);
 
     this->thread_pool->wait();
 
-    if (!is_mid_run_dump || !getDeviceDebugDumpEnabled()) {
-        this->device_markers_per_core_risc_map.clear();
-    }
-
+    this->device_markers_per_core_risc_map.clear();
 #endif
 }
 
@@ -2498,7 +2493,7 @@ void DeviceProfiler::destroyTracyContexts() {
 void DeviceProfiler::pollDebugDumpResults(
     IDevice* device, const std::vector<CoreCoord>& virtual_cores, bool is_final_poll) {
 #if defined(TRACY_ENABLE)
-    if (!getDeviceProfilerState() || !getDeviceDebugDumpEnabled()) {
+    if (!getDeviceProfilerState()) {
         return;
     }
 
@@ -2528,10 +2523,6 @@ void DeviceProfiler::pollDebugDumpResults(
 
     // Handle worker cores: use ping-pong DRAM buffer logic
     if (worker_cores.empty()) {
-        // No worker cores to process, just dump dispatch core results if any
-        if (!dispatch_cores.empty()) {
-            dumpDeviceResults(/*is_mid_run_dump=*/true);
-        }
         return;
     }
 
@@ -2710,8 +2701,6 @@ void DeviceProfiler::pollDebugDumpResults(
                 riscs_with_l1_data);
         }
     }
-
-    dumpDeviceResults(/*is_mid_run_dump=*/true);
 
     // Commit the DeviceProfiler state updates on the host side
     for (const auto& [virtual_core, risc_types] : stalled_cores_with_data) {
