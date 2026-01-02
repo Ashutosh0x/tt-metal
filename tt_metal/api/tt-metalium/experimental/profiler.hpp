@@ -9,7 +9,6 @@
 #include <map>
 #include <set>
 #include <umd/device/types/cluster_descriptor_types.hpp>
-#include <tt-metalium/device.hpp>
 
 namespace tt::tt_metal::experimental {
 
