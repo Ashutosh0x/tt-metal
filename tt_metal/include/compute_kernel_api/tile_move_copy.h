@@ -43,7 +43,7 @@ ALWI void copy_tile_to_dst_init_short(
  * registers.
  */
 ALWI void copy_tile_init(uint32_t cbid, uint32_t call_line = __builtin_LINE()) {
-    copy_tile_to_dst_init_short(cbid, call_line);
+    copy_tile_to_dst_init_short(cbid, 0, false, call_line);
 }
 
 // clang-format off
