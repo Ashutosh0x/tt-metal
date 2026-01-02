@@ -1156,16 +1156,18 @@ std::map<ChipId, std::set<ProgramAnalysisData>> GetAllProgramsPerfData() {
     return all_programs_perf_data;
 }
 
+}  // namespace experimental
+
 void LaunchIntervalBasedProfilerReadThread(const std::vector<IDevice*>& active_devices) {
+#if defined(TRACY_ENABLE)
     std::unordered_map<ChipId, std::vector<CoreCoord>> virtual_cores_map;
     for (IDevice* device : active_devices) {
         virtual_cores_map[device->id()] = detail::getVirtualCoresForProfiling(device, ProfilerReadState::NORMAL);
     }
 
     MetalContext::instance().profiler_state_manager()->start_debug_dump_thread(active_devices, virtual_cores_map);
+#endif
 }
-
-}  // namespace experimental
 
 }  // namespace tt::tt_metal
 

@@ -215,7 +215,7 @@ void DeviceManager::init_profiler() const {
 
     if (tt::tt_metal::MetalContext::instance().profiler_state_manager() &&
         tt::tt_metal::MetalContext::instance().rtoptions().get_experimental_device_debug_dump_enabled()) {
-        experimental::LaunchIntervalBasedProfilerReadThread(this->get_all_active_devices());
+        tt::tt_metal::LaunchIntervalBasedProfilerReadThread(this->get_all_active_devices());
     }
 #endif
 }
