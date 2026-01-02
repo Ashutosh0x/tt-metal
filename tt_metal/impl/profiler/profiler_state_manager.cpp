@@ -11,6 +11,7 @@
 #include "context/metal_context.hpp"
 #include "math.hpp"
 #include "tt_cluster.hpp"
+#include <tt-metalium/device.hpp>
 
 namespace tt::tt_metal {
 
