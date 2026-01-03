@@ -5,6 +5,8 @@
 #pragma once
 
 #include <umd/device/types/core_coordinates.hpp>
+#include <fstream>
+#include <sstream>
 #include <string>
 
 #include "api/tt-metalium/data_types.hpp"
@@ -41,6 +43,22 @@ struct KernelSource {
             name = "Kernel_Source_Code";
         }
         return name;
+    }
+
+    // Returns the actual source code content.
+    // For FILE_PATH: reads and returns file contents.
+    // For SOURCE_CODE: returns the source string directly.
+    std::string get_content() const {
+        if (this->source_type_ == SourceType::FILE_PATH) {
+            std::ifstream file(path_);
+            if (!file.is_open()) {
+                throw std::runtime_error("Cannot open kernel source file: " + path_.string());
+            }
+            std::stringstream buffer;
+            buffer << file.rdbuf();
+            return buffer.str();
+        }
+        return source_;
     }
 };
 
