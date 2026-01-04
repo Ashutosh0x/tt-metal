@@ -13,13 +13,11 @@
 #include "ttnn/tensor/types.hpp"
 #include <cstdint>
 #include <optional>
-#include <tt-logger/tt-logger.hpp>
 #include <vector>
 #include "ttnn/tensor/storage.hpp"
 #include <tt-metalium/hal.hpp>
 #include <algorithm>
 #include "ttnn/operations/core/compute_kernel/compute_kernel_config.hpp"
-#include "ttnn/types.hpp"
 
 namespace ttnn::operations::pool {
 /**
@@ -385,7 +383,6 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
         in_reader_indices_cb_npages,
         tt::DataFormat::UInt16,
         config_tensor_in_dram ? nullptr : reader_indices_storage.get_buffer());
-    // reader_indices_storage.get_buffer());
 
     log_debug(
         tt::LogOp,
@@ -778,41 +775,52 @@ Pool2D::MultiCore::cached_program_t pool2d_multi_core_sharded_with_halo_v2_impl_
         SetRuntimeArgs(program, compute_kernel, core, args);
     }
 
-    // auto temporary_size = calculate_total_cb_size(program);
+    auto temporary_size = calculate_total_cb_size(program);
 
-    // uint32_t post_allocate_size =
-    //     input.device()->allocator()->get_statistics(tt::tt_metal::BufferType::L1).total_allocated_bytes;
-    // uint32_t l1_usage = calculate_L1_usage(
-    //     input,
-    //     in_c,
-    //     pad_h,
-    //     pad_w,
-    //     ceil_pad_h,
-    //     ceil_pad_w,
-    //     ceil_mode,
-    //     return_indices,
-    //     kernel_h,
-    //     kernel_w,
-    //     out_h,
-    //     out_w,
-    //     input.memory_config(),
-    //     outputs[0].memory_config(),
-    //     pool_type,
-    //     count_include_pad,
-    //     divisor_override,
-    //     output_layout,
-    //     outputs[0].dtype());
+    // As the CBs are now in L1_SMALL instead of L1, it is included in temporary_size.
+    // However, calculate_L1_usage doesn't account for this size.
+    // So we need to subtract these sizes from temporary_size before comparison.
+    if (config_tensor_in_dram) {
+        temporary_size -= reader_indices_storage.get_buffer()->page_size();
+        if (!one_scalar_per_core) {
+            temporary_size -= config_tensor.device_storage().get_buffer()->page_size();
+        }
+    }
+    uint32_t post_allocate_size =
+        input.device()->allocator()->get_statistics(tt::tt_metal::BufferType::L1).total_allocated_bytes;
+    uint32_t l1_usage = calculate_L1_usage(
+        input,
+        in_c,
+        pad_h,
+        pad_w,
+        ceil_pad_h,
+        ceil_pad_w,
+        ceil_mode,
+        return_indices,
+        kernel_h,
+        kernel_w,
+        out_h,
+        out_w,
+        input.memory_config(),
+        outputs[0].memory_config(),
+        pool_type,
+        count_include_pad,
+        divisor_override,
+        output_layout,
+        outputs[0].dtype());
 
-    // uint32_t output_cb_size = post_allocate_size - memory_used;
+    uint32_t output_cb_size = post_allocate_size - memory_used;
 
     // For now assume that if post_op_l1_allocation_size == 0 op is being run
     // in graph capture NO_DISPATCH mode.
-    // bool is_graph_capture_no_dispatch_mode = post_allocate_size == 0;
-    // TT_FATAL(
-    //     temporary_size + output_cb_size == l1_usage || is_graph_capture_no_dispatch_mode,
-    //     "Calculated CB size {} does not match with the actual CB size {}  ",
-    //     temporary_size + output_cb_size,
-    //     l1_usage);
+    bool is_graph_capture_no_dispatch_mode = post_allocate_size == 0;
+    TT_FATAL(
+        temporary_size + output_cb_size == l1_usage || is_graph_capture_no_dispatch_mode,
+        "Calculated CB size {} + {} = {} does not match with the actual CB size {}  ",
+        temporary_size,
+        output_cb_size,
+        temporary_size + output_cb_size,
+        l1_usage);
 
     {  // debug
         log_debug(tt::LogOp, "raw_in_cb :: PS = {}, NP = {}", raw_in_cb_pagesize, raw_in_cb_npages);
