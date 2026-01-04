@@ -123,7 +123,7 @@ def test_max_pool2d_height_shard(device, in_dtype, input_spec, tensor_map):
 
 @pytest.mark.parametrize("input_spec", parameters["width_shard_tests"]["input_specs"])
 @pytest.mark.parametrize("in_dtype", parameters["width_shard_tests"]["in_dtype"])
-@pytest.mark.parametrize("device_params", [{"l1_small_size": 16384}], indirect=True)
+@pytest.mark.parametrize("device_params", [{"l1_small_size": 0}], indirect=True)
 def test_max_pool2d_width_shard(device, in_dtype, input_spec, tensor_map):
     (
         in_n,
@@ -158,7 +158,7 @@ def test_max_pool2d_width_shard(device, in_dtype, input_spec, tensor_map):
 
 @pytest.mark.parametrize("input_spec", parameters["block_shard_tests"]["input_specs"])
 @pytest.mark.parametrize("in_dtype", parameters["block_shard_tests"]["in_dtype"])
-@pytest.mark.parametrize("device_params", [{"l1_small_size": 16384}], indirect=True)
+@pytest.mark.parametrize("device_params", [{"l1_small_size": 0}], indirect=True)
 def test_max_pool2d_block_shard(device, in_dtype, input_spec, tensor_map):
     (
         in_n,
@@ -194,7 +194,7 @@ def test_max_pool2d_block_shard(device, in_dtype, input_spec, tensor_map):
 @pytest.mark.parametrize("input_spec", parameters["out_mem_config_tests"]["input_specs"])
 @pytest.mark.parametrize("in_dtype", parameters["out_mem_config_tests"]["in_dtype"])
 @pytest.mark.parametrize("out_memory_config", [ttnn.L1_MEMORY_CONFIG, ttnn.DRAM_MEMORY_CONFIG])
-@pytest.mark.parametrize("device_params", [{"l1_small_size": 16384}], indirect=True)
+@pytest.mark.parametrize("device_params", [{"l1_small_size": 0}], indirect=True)
 def test_max_pool2d_mem_config(device, in_dtype, input_spec, out_memory_config, tensor_map):
     (
         in_n,
@@ -231,7 +231,7 @@ def test_max_pool2d_mem_config(device, in_dtype, input_spec, out_memory_config, 
 @pytest.mark.parametrize("input_spec", parameters["tiled_out_tests"]["input_specs"])
 @pytest.mark.parametrize("in_dtype", parameters["tiled_out_tests"]["in_dtype"])
 @pytest.mark.parametrize("out_dtype", parameters["tiled_out_tests"]["out_dtype"])
-@pytest.mark.parametrize("device_params", [{"l1_small_size": 16384}], indirect=True)
+@pytest.mark.parametrize("device_params", [{"l1_small_size": 0}], indirect=True)
 def test_max_pool2d_tiled_out(device, in_dtype, input_spec, out_dtype, tensor_map):
     output_layout = ttnn.TILE_LAYOUT
 
@@ -270,7 +270,7 @@ def test_max_pool2d_tiled_out(device, in_dtype, input_spec, out_dtype, tensor_ma
 
 @pytest.mark.parametrize("input_spec", parameters["in_mem_config_tests"]["input_specs"])
 @pytest.mark.parametrize("cores", parameters["in_mem_config_tests"]["cores"])
-@pytest.mark.parametrize("device_params", [{"l1_small_size": 16384}], indirect=True)
+@pytest.mark.parametrize("device_params", [{"l1_small_size": 0}], indirect=True)
 def test_max_pool2d_in_mem_config(device, input_spec, cores, tensor_map):
     (
         in_n,
