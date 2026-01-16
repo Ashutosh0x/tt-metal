@@ -9,6 +9,7 @@ from models.demos.ministral_8b.tt.ministral_model import TtMinistralModel, custo
 from models.demos.ministral_8b.tt.ministral_decoder import TtMinistralDecoderBlock
 from models.demos.ministral_8b.tt.ministral_attention import TtMinistralAttention
 from models.demos.ministral_8b.tt.ministral_mlp import TtMinistralMLP
+from models.demos.ministral_8b.tt.ministral_rope import RoPEEmbedding, precompute_freqs_cis, apply_rotary_emb
 
 __all__ = [
     "MinistralConfig",
@@ -17,5 +18,9 @@ __all__ = [
     "TtMinistralDecoderBlock",
     "TtMinistralAttention",
     "TtMinistralMLP",
+    "RoPEEmbedding",
+    "precompute_freqs_cis",
+    "apply_rotary_emb",
     "custom_preprocessor",
 ]
+
