@@ -90,7 +90,12 @@ class TtPhiAttention(LightweightModule):
         bsz, seq_len, _ = x.shape
         
         # Projected QKV
-        qkv = ttnn.linear(x, self.w_qkv, bias=self.b_qkv)
+        qkv = ttnn.linear(
+            x, 
+            self.w_qkv, 
+            bias=self.b_qkv, 
+            memory_config=self.args.model_config["L1_MEMCFG"]
+        )
         
         # Split Q, K, V
         q, k, v = ttnn.split(qkv, self.hidden_size, dim=-1)
@@ -105,7 +110,6 @@ class TtPhiAttention(LightweightModule):
         v = ttnn.permute(v, (0, 2, 1, 3))
 
         # Partial RoPE (applied to Q and K)
-        # Note: cos/sin must match the sequence length of q/k
         if self.rotary_dim < self.head_dim:
             q_rot = ttnn.slice(q, [0, 0, 0, 0], [bsz, self.num_heads, seq_len, self.rotary_dim])
             q_pass = ttnn.slice(q, [0, 0, 0, self.rotary_dim], [bsz, self.num_heads, seq_len, self.head_dim])
@@ -125,18 +129,25 @@ class TtPhiAttention(LightweightModule):
         # KV Cache Update
         if layer_past is not None:
             k, v = layer_past.update(k, v, layer_past_len)
-            # After update, k and v contain full history up to layer_past_len + seq_len
-            # For SDPA, we use the cached versions
 
         # Scale dot product attention
         attn_output = ttnn.transformer.scaled_dot_product_attention(
-            q, k, v, attn_mask=mask, is_causal=(layer_past_len == 0), scale=self.scale
+            q, k, v, 
+            attn_mask=mask, 
+            is_causal=(layer_past_len == 0), 
+            scale=self.scale,
+            memory_config=self.args.model_config["L1_MEMCFG"]
         )
         
         # Reshape and project out
         attn_output = ttnn.permute(attn_output, (0, 2, 1, 3))
         attn_output = ttnn.reshape(attn_output, (bsz, seq_len, self.hidden_size))
         
-        output = ttnn.linear(attn_output, self.w_out, bias=self.b_out)
+        output = ttnn.linear(
+            attn_output, 
+            self.w_out, 
+            bias=self.b_out, 
+            memory_config=self.args.model_config["L1_MEMCFG"]
+        )
         
         return output

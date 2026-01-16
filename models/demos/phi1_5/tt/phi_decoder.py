@@ -42,14 +42,19 @@ class TtPhiDecoderLayer(LightweightModule):
         residual = x
         
         # Norm
-        norm_x = ttnn.layer_norm(x, weight=self.input_layernorm_weight, bias=self.input_layernorm_bias)
+        norm_x = ttnn.layer_norm(
+            x, 
+            weight=self.input_layernorm_weight, 
+            bias=self.input_layernorm_bias,
+            memory_config=self.args.model_config["L1_MEMCFG"]
+        )
         
         # Parallel Attention and MLP
         attn_out = self.self_attn(norm_x, cos, sin, mask, layer_past, layer_past_len)
         mlp_out = self.mlp(norm_x)
         
         # x = residual + attn_out + mlp_out
-        x = ttnn.add(residual, attn_out)
-        x = ttnn.add(x, mlp_out)
+        x = ttnn.add(residual, attn_out, memory_config=self.args.model_config["L1_MEMCFG"])
+        x = ttnn.add(x, mlp_out, memory_config=self.args.model_config["L1_MEMCFG"])
         
         return x

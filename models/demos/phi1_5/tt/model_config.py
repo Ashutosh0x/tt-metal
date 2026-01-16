@@ -47,3 +47,20 @@ class TtPhiArgs:
             "DEFAULT_MEMCFG": ttnn.DRAM_MEMORY_CONFIG,
             "L1_MEMCFG": ttnn.L1_MEMORY_CONFIG,
         }
+
+        # Sharding Configs (Assuming Wormhole 8x8 grid)
+        self.compute_grid_size = device.compute_with_storage_grid_size()
+        self.num_cores = self.compute_grid_size.x * self.compute_grid_size.y
+        
+        # Height sharding for hidden_size=2048
+        # 2048 / 32 (TILE) = 64 tiles. We can shard across 64 cores or 32 cores.
+        self.sharded_mem_config = ttnn.MemoryConfig(
+            ttnn.TensorMemoryLayout.HEIGHT_SHARDED,
+            ttnn.BufferType.L1,
+            ttnn.ShardSpec(
+                ttnn.CoreRangeSet({ttnn.CoreRange(ttnn.CoreCoord(0, 0), ttnn.CoreCoord(7, 3))}), # 32 cores example
+                [32, 2048], # Shard shape: [seq_per_core, hidden_size]
+                ttnn.ShardOrientation.ROW_MAJOR,
+                False,
+            ),
+        )

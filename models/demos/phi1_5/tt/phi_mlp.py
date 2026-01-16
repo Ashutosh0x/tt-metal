@@ -34,8 +34,21 @@ class TtPhiMLP(LightweightModule):
         )
 
     def forward(self, x):
-        x = ttnn.linear(x, self.w_fc1, bias=self.b_fc1)
+        # x is expected to be sharded or in L1 for best performance
+        x = ttnn.linear(
+            x, 
+            self.w_fc1, 
+            bias=self.b_fc1, 
+            memory_config=self.args.model_config["L1_MEMCFG"]
+        )
+        
         # Use gelu_new (approximate)
-        x = ttnn.gelu(x)
-        x = ttnn.linear(x, self.w_fc2, bias=self.b_fc2)
+        x = ttnn.gelu(x, memory_config=self.args.model_config["L1_MEMCFG"])
+        
+        x = ttnn.linear(
+            x, 
+            self.w_fc2, 
+            bias=self.b_fc2, 
+            memory_config=self.args.model_config["L1_MEMCFG"]
+        )
         return x
