@@ -15,6 +15,8 @@ Implements a single transformer decoder layer with:
 import ttnn
 from models.common.rmsnorm import RMSNorm
 from models.common.lightweightmodule import LightweightModule
+from models.demos.ministral_8b.tt.ministral_attention import TtMinistralAttention
+from models.demos.ministral_8b.tt.ministral_mlp import TtMinistralMLP
 
 
 class TtMinistralDecoderBlock(LightweightModule):
@@ -67,10 +69,25 @@ class TtMinistralDecoderBlock(LightweightModule):
             weight_key="weight",
         )
         
-        # Attention and MLP will be added in subsequent implementation
-        # For now, we define the forward pass structure
-        self.attention = None  # TtMinistralAttention (to be implemented)
-        self.mlp = None  # TtMinistralMLP (to be implemented)
+        # Attention module
+        self.attention = TtMinistralAttention(
+            args=args,
+            mesh_device=mesh_device,
+            dtype=dtype,
+            state_dict=state_dict,
+            layer_num=layer_num,
+            weight_cache_path=weight_cache_path,
+        )
+        
+        # MLP module
+        self.mlp = TtMinistralMLP(
+            args=args,
+            mesh_device=mesh_device,
+            dtype=dtype,
+            state_dict=state_dict,
+            layer_num=layer_num,
+            weight_cache_path=weight_cache_path,
+        )
     
     def forward(
         self,
@@ -96,18 +113,14 @@ class TtMinistralDecoderBlock(LightweightModule):
         # Pre-attention normalization
         normed_x = self.attention_norm(x)
         
-        # Self-attention with residual
-        if self.attention is not None:
-            attn_out = self.attention(
-                normed_x,
-                current_pos=current_pos,
-                rot_mats=rot_mats,
-                mode=mode,
-                kv_cache=kv_cache,
-            )
-        else:
-            # Placeholder: pass through for initial testing
-            attn_out = normed_x
+        # Self-attention
+        attn_out = self.attention.forward(
+            normed_x,
+            current_pos=current_pos,
+            rot_mats=rot_mats,
+            mode=mode,
+            kv_cache=kv_cache,
+        )
         
         # Residual connection
         h = ttnn.add(x, attn_out)
@@ -115,12 +128,8 @@ class TtMinistralDecoderBlock(LightweightModule):
         # Pre-FFN normalization
         normed_h = self.ffn_norm(h)
         
-        # MLP with residual
-        if self.mlp is not None:
-            mlp_out = self.mlp(normed_h, mode=mode)
-        else:
-            # Placeholder: pass through for initial testing
-            mlp_out = normed_h
+        # MLP
+        mlp_out = self.mlp.forward(normed_h, mode=mode)
         
         # Residual connection
         out = ttnn.add(h, mlp_out)
