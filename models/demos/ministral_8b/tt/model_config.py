@@ -98,6 +98,30 @@ class TtMinistralArgs:
         
         # Interleaved config for intermediate tensors
         self.interleaved_mem_config = ttnn.DRAM_MEMORY_CONFIG
+        
+        # Sharded configurations for Stage 2 optimizations
+        self._setup_sharded_configs()
+    
+    def _setup_sharded_configs(self):
+        """Setup sharded memory configurations for performance"""
+        
+        # Core grid for sharding (7x8 = 56 cores typical for N150/N300)
+        self.core_grid = ttnn.CoreGrid(x=7, y=8)
+        self.num_cores = 56
+        
+        # Width-sharded config for attention output (dim=4096)
+        # Shard across cores: 4096 / 56 ≈ 73.14 → pad to 96 per core
+        self.attn_output_shard_width = 128  # Tile-aligned
+        
+        # Height-sharded config for batch dimension
+        self.batch_shard_height = 32  # Min tile size
+        
+        # MLP sharded configs
+        # hidden_dim = 14336, shard across cores
+        self.mlp_shard_width = 256  # 14336 / 56 ≈ 256
+        
+        # Program configs for matmuls (to be used with sharded inputs)
+        self.use_sharded_matmul = True
     
     def get_model_config(self):
         """Return model configuration dictionary"""

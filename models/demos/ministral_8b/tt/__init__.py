@@ -10,6 +10,7 @@ from models.demos.ministral_8b.tt.ministral_decoder import TtMinistralDecoderBlo
 from models.demos.ministral_8b.tt.ministral_attention import TtMinistralAttention
 from models.demos.ministral_8b.tt.ministral_mlp import TtMinistralMLP
 from models.demos.ministral_8b.tt.ministral_rope import RoPEEmbedding, precompute_freqs_cis, apply_rotary_emb
+from models.demos.ministral_8b.tt.kv_cache import KVCache, PagedKVCache
 
 __all__ = [
     "MinistralConfig",
@@ -21,6 +22,7 @@ __all__ = [
     "RoPEEmbedding",
     "precompute_freqs_cis",
     "apply_rotary_emb",
+    "KVCache",
+    "PagedKVCache",
     "custom_preprocessor",
 ]
-
