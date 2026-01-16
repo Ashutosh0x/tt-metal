@@ -86,7 +86,7 @@ class TtPhiAttention(LightweightModule):
             memory_config=ttnn.DRAM_MEMORY_CONFIG,
         )
 
-    def forward(self, x, cos, sin, mask=None):
+    def forward(self, x, cos, sin, mask=None, layer_past=None, layer_past_len=0):
         bsz, seq_len, _ = x.shape
         
         # Projected QKV
@@ -104,7 +104,8 @@ class TtPhiAttention(LightweightModule):
         k = ttnn.permute(k, (0, 2, 1, 3))
         v = ttnn.permute(v, (0, 2, 1, 3))
 
-        # Partial RoPE
+        # Partial RoPE (applied to Q and K)
+        # Note: cos/sin must match the sequence length of q/k
         if self.rotary_dim < self.head_dim:
             q_rot = ttnn.slice(q, [0, 0, 0, 0], [bsz, self.num_heads, seq_len, self.rotary_dim])
             q_pass = ttnn.slice(q, [0, 0, 0, self.rotary_dim], [bsz, self.num_heads, seq_len, self.head_dim])
@@ -121,10 +122,15 @@ class TtPhiAttention(LightweightModule):
             q = ttnn.experimental.rotary_embedding(q, cos, sin)
             k = ttnn.experimental.rotary_embedding(k, cos, sin)
 
+        # KV Cache Update
+        if layer_past is not None:
+            k, v = layer_past.update(k, v, layer_past_len)
+            # After update, k and v contain full history up to layer_past_len + seq_len
+            # For SDPA, we use the cached versions
+
         # Scale dot product attention
-        # ttnn.transformer.scaled_dot_product_attention is available
         attn_output = ttnn.transformer.scaled_dot_product_attention(
-            q, k, v, attn_mask=mask, is_causal=True, scale=self.scale
+            q, k, v, attn_mask=mask, is_causal=(layer_past_len == 0), scale=self.scale
         )
         
         # Reshape and project out

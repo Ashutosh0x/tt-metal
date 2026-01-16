@@ -39,18 +39,21 @@ def run_yolos_small_demo(device):
     
     # Prepare input for ttnn
     # Stage 1: Manual patch embedding or mock input
-    # In a full implementation, we'd do the patch embedding in ttnn
-    pixel_values = inputs["pixel_values"]
+    pixel_values = inputs["pixel_values"]  # [1, 3, 512, 512]
     print(f"Input image shape: {pixel_values.shape}")
     
-    # Run tt inference
-    # For now, we use a random tensor matching expected encoder input shape
-    # [batch, seq_len, hidden_size]
-    seq_len = args.num_patches + args.num_detection_tokens + 1
-    input_tt = torch.randn(1, seq_len, args.hidden_size)
+    # Patchify: [1, 3, 512, 512] -> [1, 1024, 768]
+    # 512/16 = 32 patches in each dimension
+    B, C, H, W = pixel_values.shape
+    P = args.patch_size
+    assert H % P == 0 and W % P == 0
+    
+    patches = pixel_values.unfold(2, P, P).unfold(3, P, P) # [B, C, 32, 32, 16, 16]
+    patches = patches.permute(0, 2, 3, 4, 5, 1) # [B, 32, 32, 16, 16, 3]
+    patches = patches.reshape(B, (H//P)*(W//P), P*P*C) # [B, 1024, 768]
     
     tt_input = ttnn.from_torch(
-        input_tt,
+        patches,
         dtype=ttnn.bfloat16,
         layout=ttnn.TILE_LAYOUT,
         device=device,

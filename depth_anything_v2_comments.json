@@ -1,0 +1,1679 @@
+[
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/issues/comments/3756358584",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#issuecomment-3756358584",
+        "issue_url": "https://api.github.com/repos/tenstorrent/tt-metal/issues/35565",
+        "id": 3756358584,
+        "node_id": "IC_kwDOI9Wqc87f5Xu4",
+        "user": {
+            "login": "jberkowitzTT",
+            "id": 239675896,
+            "node_id": "U_kgDODkkp-A",
+            "avatar_url": "https://avatars.githubusercontent.com/u/239675896?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/jberkowitzTT",
+            "html_url": "https://github.com/jberkowitzTT",
+            "followers_url": "https://api.github.com/users/jberkowitzTT/followers",
+            "following_url": "https://api.github.com/users/jberkowitzTT/following{/other_user}",
+            "gists_url": "https://api.github.com/users/jberkowitzTT/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/jberkowitzTT/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/jberkowitzTT/subscriptions",
+            "organizations_url": "https://api.github.com/users/jberkowitzTT/orgs",
+            "repos_url": "https://api.github.com/users/jberkowitzTT/repos",
+            "events_url": "https://api.github.com/users/jberkowitzTT/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/jberkowitzTT/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "created_at": "2026-01-15T18:47:50Z",
+        "updated_at": "2026-01-15T18:47:50Z",
+        "body": "@Ashutosh0x - are you interested in taking on this bounty: https://github.com/tenstorrent/tt-metal/issues/31286",
+        "author_association": "NONE",
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/issues/comments/3756358584/reactions",
+            "total_count": 1,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 1,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "performed_via_github_app": null
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/issues/comments/3758652137",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#issuecomment-3758652137",
+        "issue_url": "https://api.github.com/repos/tenstorrent/tt-metal/issues/35565",
+        "id": 3758652137,
+        "node_id": "IC_kwDOI9Wqc87gCHrp",
+        "user": {
+            "login": "Ashutosh0x",
+            "id": 161562995,
+            "node_id": "U_kgDOCaFBcw",
+            "avatar_url": "https://avatars.githubusercontent.com/u/161562995?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Ashutosh0x",
+            "html_url": "https://github.com/Ashutosh0x",
+            "followers_url": "https://api.github.com/users/Ashutosh0x/followers",
+            "following_url": "https://api.github.com/users/Ashutosh0x/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Ashutosh0x/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Ashutosh0x/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Ashutosh0x/subscriptions",
+            "organizations_url": "https://api.github.com/users/Ashutosh0x/orgs",
+            "repos_url": "https://api.github.com/users/Ashutosh0x/repos",
+            "events_url": "https://api.github.com/users/Ashutosh0x/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Ashutosh0x/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "created_at": "2026-01-16T08:00:53Z",
+        "updated_at": "2026-01-16T08:00:53Z",
+        "body": "I have addressed all 23 reviewer comments and finalized the Depth Anything V2 Large port to \ttnn. \n\n### Key Improvements:\n- **ViT Layer Architecture**: Implemented proper multi-head attention with correct reshaping, permuting, and TILE <-> ROW_MAJOR layout management.\n- **Attention Logic**: Applied scaling factors (1/sqrt(head_dim)) before softmax and corrected QK^T permutation dimensions.\n- **DPT Components**: Implemented TtDPTReassembleLayer, TtDPTFusionStage, and TtDPTHead as callable objects, removing unnecessary \torch.nn.Module inheritance.\n- **Refactoring**: Cleaned up all unused/redundant imports and added safety checks for device closure in the demo script.\n- **Test Infrastructure**: Updated \test_model.py and demo.py to match the new model signature and initialization logic.\n\nEverything is now aligned with the \ttnn reference implementations and ready for further verification on hardware.",
+        "author_association": "NONE",
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/issues/comments/3758652137/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "performed_via_github_app": null
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665963",
+        "pull_request_review_id": 3645617039,
+        "id": 2677665963,
+        "node_id": "PRRC_kwDOI9Wqc86fmfCr",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# ViT Backbone (Simplified Port)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+def vit_layer(hidden_states, parameters):\r\n+    # Layernorm 1\r\n+    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n+    \r\n+    # Self Attention (Simplified Matmuls)\r\n+    # Projections\r\n+    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n+    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n+    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n+    \r\n+    # Q * K\r\n+    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The permute operation on line 65 has incorrect dimensions. The key tensor should be permuted to transpose the last two dimensions for attention computation. In the ViT attention mechanism, after reshaping to (batch, seq, num_heads, head_dim), the key needs to be permuted to (batch, num_heads, head_dim, seq) for the QK^T multiplication. The current permute (0, 2, 1, 3) would result in (batch, seq, num_heads, head_dim) which is incorrect. It should be (0, 2, 3, 1) as seen in reference implementations.\n```suggestion\n    attn = q @ ttnn.permute(k, (0, 2, 3, 1))  # Transpose last two dims for QK^T\n```",
+        "created_at": "2026-01-09T21:25:52Z",
+        "updated_at": "2026-01-09T21:26:01Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665963",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665963"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665963"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665963/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 65,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 65,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665972",
+        "pull_request_review_id": 3645617039,
+        "id": 2677665972,
+        "node_id": "PRRC_kwDOI9Wqc86fmfC0",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# ViT Backbone (Simplified Port)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+def vit_layer(hidden_states, parameters):\r\n+    # Layernorm 1\r\n+    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n+    \r\n+    # Self Attention (Simplified Matmuls)\r\n+    # Projections\r\n+    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n+    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n+    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n+    \r\n+    # Q * K\r\n+    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r\n+    attn = ttnn.softmax(attn, dim=-1)\r\n+    \r\n+    # Attn * V\r\n+    attn_out = attn @ v\r\n+    \r\n+    # Output dense\r\n+    attn_out = attn_out @ parameters.attention.output.dense.weight + parameters.attention.output.dense.bias\r\n+    \r\n+    # Residual 1\r\n+    hidden_states = hidden_states + attn_out\r\n+    \r\n+    # Layernorm 2\r\n+    ln2 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_after.weight, bias=parameters.layernorm_after.bias)\r\n+    \r\n+    # MLP\r\n+    mlp_out = ln2 @ parameters.intermediate.dense.weight + parameters.intermediate.dense.bias\r\n+    mlp_out = ttnn.gelu(mlp_out)\r\n+    mlp_out = mlp_out @ parameters.output.dense.weight + parameters.output.dense.bias\r\n+    \r\n+    # Residual 2\r\n+    hidden_states = hidden_states + mlp_out\r\n+    \r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The vit_layer function expects tensors to be in specific shapes but does not receive a config parameter that contains necessary configuration like num_attention_heads and hidden_size. These values are required to properly reshape tensors during attention computation. The function signature should include a config parameter similar to the reference implementation in models/demos/vit/tt/ttnn_functional_vit.py.\n```suggestion\ndef vit_layer(hidden_states, parameters, config):\n    # Layernorm 1\r\n    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n\n    # Self Attention (Multi-head)\n    # Projections: [batch_size, seq_len, hidden_size]\n    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n\n    # Reshape to multi-head: [batch_size, num_heads, seq_len, head_dim]\n    batch_size, seq_len, _ = q.shape\n    num_heads = config.num_attention_heads\n    hidden_size = config.hidden_size\n    head_dim = hidden_size // num_heads\n\n    q = ttnn.reshape(q, (batch_size, seq_len, num_heads, head_dim))\n    k = ttnn.reshape(k, (batch_size, seq_len, num_heads, head_dim))\n    v = ttnn.reshape(v, (batch_size, seq_len, num_heads, head_dim))\n\n    # Permute to [batch_size, num_heads, seq_len, head_dim]\n    q = ttnn.permute(q, (0, 2, 1, 3))\n    k = ttnn.permute(k, (0, 2, 1, 3))\n    v = ttnn.permute(v, (0, 2, 1, 3))\n\n    # Q * K^T -> [batch_size, num_heads, seq_len, seq_len]\n    attn = q @ ttnn.permute(k, (0, 1, 3, 2))\n    attn = ttnn.softmax(attn, dim=-1)\r\n\n    # Attn * V -> [batch_size, num_heads, seq_len, head_dim]\n    attn_out = attn @ v\r\n\n    # Merge heads back to [batch_size, seq_len, hidden_size]\n    attn_out = ttnn.permute(attn_out, (0, 2, 1, 3))\n    attn_out = ttnn.reshape(attn_out, (batch_size, seq_len, hidden_size))\n\n    # Output dense\r\n    attn_out = attn_out @ parameters.attention.output.dense.weight + parameters.attention.output.dense.bias\r\n\n    # Residual 1\r\n    hidden_states = hidden_states + attn_out\r\n\n    # Layernorm 2\r\n    ln2 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_after.weight, bias=parameters.layernorm_after.bias)\r\n\n    # MLP\r\n    mlp_out = ln2 @ parameters.intermediate.dense.weight + parameters.intermediate.dense.bias\r\n    mlp_out = ttnn.gelu(mlp_out)\r\n    mlp_out = mlp_out @ parameters.output.dense.weight + parameters.output.dense.bias\r\n\n    # Residual 2\r\n    hidden_states = hidden_states + mlp_out\r\n```",
+        "created_at": "2026-01-09T21:25:52Z",
+        "updated_at": "2026-01-09T21:26:01Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665972",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665972"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665972"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665972/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 54,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 87,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 87,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665982",
+        "pull_request_review_id": 3645617039,
+        "id": 2677665982,
+        "node_id": "PRRC_kwDOI9Wqc86fmfC-",
+        "diff_hunk": "@@ -0,0 +1,70 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import torch.nn.functional as F\r\n+import numpy as np\r\n+import cv2\r\n+from PIL import Image\r\n+import transformers\r",
+        "path": "models/demos/depth_anything_v2/demo/demo.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Unused imports detected. Lines 5-9 import cv2, PIL.Image, torch.nn.functional as F, numpy as np, and transformers, but none of these are actually used in the code. These imports should be removed or the planned functionality using them should be implemented.\n```suggestion\n\n```",
+        "created_at": "2026-01-09T21:25:52Z",
+        "updated_at": "2026-01-09T21:26:01Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665982",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665982"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665982"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665982/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 5,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 9,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 9,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665986",
+        "pull_request_review_id": 3645617039,
+        "id": 2677665986,
+        "node_id": "PRRC_kwDOI9Wqc86fmfDC",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# ViT Backbone (Simplified Port)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+def vit_layer(hidden_states, parameters):\r\n+    # Layernorm 1\r\n+    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n+    \r\n+    # Self Attention (Simplified Matmuls)\r\n+    # Projections\r\n+    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n+    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n+    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n+    \r\n+    # Q * K\r\n+    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r\n+    attn = ttnn.softmax(attn, dim=-1)\r\n+    \r\n+    # Attn * V\r\n+    attn_out = attn @ v\r\n+    \r\n+    # Output dense\r\n+    attn_out = attn_out @ parameters.attention.output.dense.weight + parameters.attention.output.dense.bias\r\n+    \r\n+    # Residual 1\r\n+    hidden_states = hidden_states + attn_out\r\n+    \r\n+    # Layernorm 2\r\n+    ln2 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_after.weight, bias=parameters.layernorm_after.bias)\r\n+    \r\n+    # MLP\r\n+    mlp_out = ln2 @ parameters.intermediate.dense.weight + parameters.intermediate.dense.bias\r\n+    mlp_out = ttnn.gelu(mlp_out)\r\n+    mlp_out = mlp_out @ parameters.output.dense.weight + parameters.output.dense.bias\r\n+    \r\n+    # Residual 2\r\n+    hidden_states = hidden_states + mlp_out\r\n+    \r\n+    return hidden_states\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# Main Model: Depth Anything V2\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDepthAnythingV2(torch.nn.Module):\r\n+    def __init__(self, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The main model class TtDepthAnythingV2 inherits from torch.nn.Module but is intended to be a ttnn implementation. This is inconsistent with the goal of porting to ttnn. The class should either not inherit from torch.nn.Module or the architecture should clarify why PyTorch module inheritance is needed for a ttnn model.",
+        "created_at": "2026-01-09T21:25:53Z",
+        "updated_at": "2026-01-09T21:26:01Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665986",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665986"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665986"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665986/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 95,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 98,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 98,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665994",
+        "pull_request_review_id": 3645617039,
+        "id": 2677665994,
+        "node_id": "PRRC_kwDOI9Wqc86fmfDK",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "27007b28de4ae49c3ae8b82542e79a9afb317748",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The math module is imported on line 6 but never used in the code. Remove this unused import.\n```suggestion\n\n```",
+        "created_at": "2026-01-09T21:25:53Z",
+        "updated_at": "2026-01-09T21:26:01Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665994",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665994"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677665994"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677665994/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": 3,
+        "original_line": 6,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 6,
+        "position": 3,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666001",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666001,
+        "node_id": "PRRC_kwDOI9Wqc86fmfDR",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# ViT Backbone (Simplified Port)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+def vit_layer(hidden_states, parameters):\r\n+    # Layernorm 1\r\n+    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n+    \r\n+    # Self Attention (Simplified Matmuls)\r\n+    # Projections\r\n+    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n+    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n+    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n+    \r\n+    # Q * K\r\n+    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r\n+    attn = ttnn.softmax(attn, dim=-1)\r\n+    \r\n+    # Attn * V\r\n+    attn_out = attn @ v\r\n+    \r\n+    # Output dense\r\n+    attn_out = attn_out @ parameters.attention.output.dense.weight + parameters.attention.output.dense.bias\r\n+    \r\n+    # Residual 1\r\n+    hidden_states = hidden_states + attn_out\r\n+    \r\n+    # Layernorm 2\r\n+    ln2 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_after.weight, bias=parameters.layernorm_after.bias)\r\n+    \r\n+    # MLP\r\n+    mlp_out = ln2 @ parameters.intermediate.dense.weight + parameters.intermediate.dense.bias\r\n+    mlp_out = ttnn.gelu(mlp_out)\r\n+    mlp_out = mlp_out @ parameters.output.dense.weight + parameters.output.dense.bias\r\n+    \r\n+    # Residual 2\r\n+    hidden_states = hidden_states + mlp_out\r\n+    \r\n+    return hidden_states\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# Main Model: Depth Anything V2\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDepthAnythingV2(torch.nn.Module):\r\n+    def __init__(self, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, pixel_values):\r\n+        # 1. Embeddings (Placeholder)\r\n+        embeddings = pixel_values \r\n+        \r\n+        # 2. Encoder (ViT-Large)\r\n+        hidden_states = embeddings\r\n+        features = []\r\n+        out_indices = [5, 11, 17, 23] # for DPT usage\r\n+        \r\n+        # Iterate over layers (assumed list in parameters)\r\n+        # Note: parameters object structure is crucial here\r\n+        for i in range(24): # Large has 24 layers\r\n+            layer_params = self.parameters.backbone.encoder.layer[i]\r\n+            hidden_states = vit_layer(hidden_states, layer_params)\r\n+            \r\n+            if i in out_indices:\r\n+                features.append(hidden_states)\r\n+        \r\n+        # 3. Neck (DPT Reassemble & Fusion)\r\n+        # Simplified: just passing features through\r\n+        \r\n+        # 4. Head\r\n+        depth = features[-1] # Stub\r\n+        \r\n+        return depth\r\n+\r\n+def custom_preprocessor(torch_model, name):\r\n+    # Convert PyTorch dictionary to ttnn.Model parameters\r\n+    # This function creates the 'parameters' object used in __init__\r\n+    \r\n+    import ttnn\r\n+    \r\n+    parameters = {}\r\n+    \r\n+    # Helper to convert a single weight\r\n+    def convert(tensor):\r\n+        return ttnn.from_torch(tensor, dtype=ttnn.bfloat16, layout=ttnn.TILE_LAYOUT)\r\n+    \r\n+    # 1. Backbone\r\n+    parameters[\"backbone\"] = {\"encoder\": {\"layer\": []}}\r\n+    \r\n+    # Encoder Layers\r\n+    for i, layer in enumerate(torch_model.backbone.encoder.layer):\r\n+        layer_params = {\r\n+            \"layernorm_before\": {\r\n+                \"weight\": convert(layer.norm1.weight),\r\n+                \"bias\": convert(layer.norm1.bias)\r\n+            },\r\n+            \"attention\": {\r\n+                \"query\": {\"weight\": convert(layer.attention.attention.query.weight), \"bias\": convert(layer.attention.attention.query.bias)},\r\n+                \"key\": {\"weight\": convert(layer.attention.attention.key.weight), \"bias\": convert(layer.attention.attention.key.bias)},\r\n+                \"value\": {\"weight\": convert(layer.attention.attention.value.weight), \"bias\": convert(layer.attention.attention.value.bias)},\r\n+                \"output\": {\"dense\": {\"weight\": convert(layer.attention.output.dense.weight), \"bias\": convert(layer.attention.output.dense.bias)}}\r\n+            },\r\n+            \"layernorm_after\": {\r\n+                \"weight\": convert(layer.norm2.weight),\r\n+                \"bias\": convert(layer.norm2.bias)\r\n+            },\r\n+            \"intermediate\": {\r\n+                \"dense\": {\"weight\": convert(layer.mlp.fc1.weight), \"bias\": convert(layer.mlp.fc1.bias)}\r\n+            },\r\n+            \"output\": {\r\n+                \"dense\": {\"weight\": convert(layer.mlp.fc2.weight), \"bias\": convert(layer.mlp.fc2.bias)}\r\n+            }\r\n+        }\r\n+        parameters[\"backbone\"][\"encoder\"][\"layer\"].append(layer_params)\r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "27007b28de4ae49c3ae8b82542e79a9afb317748",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The ttnn.from_torch conversion in custom_preprocessor specifies layout=ttnn.TILE_LAYOUT for all weight tensors, but weight tensors typically need to be transposed for matrix multiplication operations in ttnn. Check if the weights need transposition before or after conversion, especially for attention query, key, value weights and dense layer weights. Reference implementations may use ttnn.permute on weights.",
+        "created_at": "2026-01-09T21:25:53Z",
+        "updated_at": "2026-01-09T21:26:01Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666001",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666001"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666001"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666001/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": 226,
+        "original_start_line": 135,
+        "start_side": "RIGHT",
+        "line": 278,
+        "original_line": 165,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 165,
+        "position": 278,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666013",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666013,
+        "node_id": "PRRC_kwDOI9Wqc86fmfDd",
+        "diff_hunk": "@@ -0,0 +1,70 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import torch.nn.functional as F\r\n+import numpy as np\r\n+import cv2\r\n+from PIL import Image\r\n+import transformers\r\n+\r\n+try:\r\n+    from transformers import AutoImageProcessor, AutoModelForDepthEstimation\r\n+except ImportError:\r\n+    print(\"Error: Could not import AutoImageProcessor or AutoModelForDepthEstimation from transformers.\")\r\n+    print(\"Please ensure you have a recent version of transformers installed.\")\r\n+    exit(1)\r\n+\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r\n+\r\n+def run_demo(\r\n+    model_id=\"depth-anything/Depth-Anything-V2-Large-hf\",\r\n+    image_path=\"models/demos/depth_anything_v2/demo/demo_image.jpg\"\r\n+):\r\n+    print(f\"Loading model: {model_id}\")\r\n+    \r\n+    # 1. Load PyTorch Model (Reference)\r\n+    try:\r\n+        torch_model = AutoModelForDepthEstimation.from_pretrained(model_id, torch_dtype=torch.float32, trust_remote_code=True)\r\n+        torch_model.eval()\r\n+        image_processor = AutoImageProcessor.from_pretrained(model_id, trust_remote_code=True)\r\n+        print(\"PyTorch model loaded successfully.\")\r\n+    except Exception as e:\r\n+        print(f\"Failed to load Hugging Face model: {e}\")\r\n+        return\r\n+\r\n+    # 2. Initialize Tenstorrent Device\r\n+    device = None\r\n+    try:\r\n+        device_id = 0\r\n+        device = ttnn.CreateDevice(device_id=device_id)\r\n+        print(f\"Device {device_id} opened.\")\r\n+    except Exception as e:\r\n+        print(f\"Warning: Failed to open Tenstorrent device (HW not present?): {e}\")\r\n+        print(\"Proceeding to verify model weight conversion on host...\")\r\n+\r\n+    # 3. Convert Weights & Initialize TT Model\r\n+    from models.demos.depth_anything_v2.tt.model_def import custom_preprocessor, TtDepthAnythingV2\r\n+    \r\n+    print(\"converting weights...\")\r\n+    parameters = custom_preprocessor(torch_model, \"depth_anything_v2\")\r\n+    \r\n+    # Needs a config object as expected by model_def.py\r\n+    # We can use the huggingface config directly as it has 'hidden_size', 'num_attention_heads' etc.\r\n+    tt_model = TtDepthAnythingV2(parameters)\r\n+    print(\"TT Model initialized.\")\r\n+\r\n+    # 4. Load & Preprocess Image\r\n+    # ...\r\n+    \r\n+    # 5. Run Inference\r\n+    # input_tensor = ...\r\n+    # output = tt_model(input_tensor)\r\n+    \r\n+    # Limit cleanup\r\n+    ttnn.close_device(device)\r\n+    print(\"Device closed.\")\r",
+        "path": "models/demos/depth_anything_v2/demo/demo.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The device cleanup at line 66 will crash if device is None (when hardware is not present). Add a check before calling ttnn.close_device. The code should only call ttnn.close_device if device is not None.\n```suggestion\n    if device is not None:\n        ttnn.close_device(device)\n        print(\"Device closed.\")\n```",
+        "created_at": "2026-01-09T21:25:53Z",
+        "updated_at": "2026-01-09T21:26:01Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666013",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666013"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666013"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666013/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 66,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 67,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 67,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666030",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666030,
+        "node_id": "PRRC_kwDOI9Wqc86fmfDu",
+        "diff_hunk": "@@ -0,0 +1,70 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import torch.nn.functional as F\r\n+import numpy as np\r\n+import cv2\r\n+from PIL import Image\r\n+import transformers\r\n+\r\n+try:\r\n+    from transformers import AutoImageProcessor, AutoModelForDepthEstimation\r\n+except ImportError:\r\n+    print(\"Error: Could not import AutoImageProcessor or AutoModelForDepthEstimation from transformers.\")\r\n+    print(\"Please ensure you have a recent version of transformers installed.\")\r\n+    exit(1)\r\n+\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r\n+\r\n+def run_demo(\r\n+    model_id=\"depth-anything/Depth-Anything-V2-Large-hf\",\r\n+    image_path=\"models/demos/depth_anything_v2/demo/demo_image.jpg\"\r\n+):\r\n+    print(f\"Loading model: {model_id}\")\r\n+    \r\n+    # 1. Load PyTorch Model (Reference)\r\n+    try:\r\n+        torch_model = AutoModelForDepthEstimation.from_pretrained(model_id, torch_dtype=torch.float32, trust_remote_code=True)\r\n+        torch_model.eval()\r\n+        image_processor = AutoImageProcessor.from_pretrained(model_id, trust_remote_code=True)\r\n+        print(\"PyTorch model loaded successfully.\")\r\n+    except Exception as e:\r\n+        print(f\"Failed to load Hugging Face model: {e}\")\r\n+        return\r\n+\r\n+    # 2. Initialize Tenstorrent Device\r\n+    device = None\r\n+    try:\r\n+        device_id = 0\r\n+        device = ttnn.CreateDevice(device_id=device_id)\r\n+        print(f\"Device {device_id} opened.\")\r\n+    except Exception as e:\r\n+        print(f\"Warning: Failed to open Tenstorrent device (HW not present?): {e}\")\r\n+        print(\"Proceeding to verify model weight conversion on host...\")\r\n+\r\n+    # 3. Convert Weights & Initialize TT Model\r\n+    from models.demos.depth_anything_v2.tt.model_def import custom_preprocessor, TtDepthAnythingV2\r",
+        "path": "models/demos/depth_anything_v2/demo/demo.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Duplicate import statement. The custom_preprocessor and TtDepthAnythingV2 are imported at line 19, then imported again at line 48. Remove the redundant import at line 48.\n```suggestion\n\n```",
+        "created_at": "2026-01-09T21:25:54Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666030",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666030"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666030"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666030/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 48,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 48,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666043",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666043,
+        "node_id": "PRRC_kwDOI9Wqc86fmfD7",
+        "diff_hunk": "@@ -0,0 +1,70 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import torch.nn.functional as F\r\n+import numpy as np\r\n+import cv2\r\n+from PIL import Image\r\n+import transformers\r\n+\r\n+try:\r\n+    from transformers import AutoImageProcessor, AutoModelForDepthEstimation\r\n+except ImportError:\r\n+    print(\"Error: Could not import AutoImageProcessor or AutoModelForDepthEstimation from transformers.\")\r\n+    print(\"Please ensure you have a recent version of transformers installed.\")\r\n+    exit(1)\r\n+\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r\n+\r\n+def run_demo(\r\n+    model_id=\"depth-anything/Depth-Anything-V2-Large-hf\",\r\n+    image_path=\"models/demos/depth_anything_v2/demo/demo_image.jpg\"\r",
+        "path": "models/demos/depth_anything_v2/demo/demo.py",
+        "commit_id": "467630e0410986a74e40fc15b4f77fb9abfbf12f",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The image_path parameter is defined but never used in the function. Either remove it from the function signature or implement the image loading and preprocessing logic that uses it.",
+        "created_at": "2026-01-09T21:25:54Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666043",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666043"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666043"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666043/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 23,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 23,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666053",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666053,
+        "node_id": "PRRC_kwDOI9Wqc86fmfEF",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# ViT Backbone (Simplified Port)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+def vit_layer(hidden_states, parameters):\r\n+    # Layernorm 1\r\n+    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n+    \r\n+    # Self Attention (Simplified Matmuls)\r\n+    # Projections\r\n+    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n+    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n+    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n+    \r\n+    # Q * K\r\n+    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r\n+    attn = ttnn.softmax(attn, dim=-1)\r\n+    \r\n+    # Attn * V\r\n+    attn_out = attn @ v\r\n+    \r\n+    # Output dense\r\n+    attn_out = attn_out @ parameters.attention.output.dense.weight + parameters.attention.output.dense.bias\r\n+    \r\n+    # Residual 1\r\n+    hidden_states = hidden_states + attn_out\r\n+    \r\n+    # Layernorm 2\r\n+    ln2 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_after.weight, bias=parameters.layernorm_after.bias)\r\n+    \r\n+    # MLP\r\n+    mlp_out = ln2 @ parameters.intermediate.dense.weight + parameters.intermediate.dense.bias\r\n+    mlp_out = ttnn.gelu(mlp_out)\r\n+    mlp_out = mlp_out @ parameters.output.dense.weight + parameters.output.dense.bias\r\n+    \r\n+    # Residual 2\r\n+    hidden_states = hidden_states + mlp_out\r\n+    \r\n+    return hidden_states\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# Main Model: Depth Anything V2\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDepthAnythingV2(torch.nn.Module):\r\n+    def __init__(self, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, pixel_values):\r\n+        # 1. Embeddings (Placeholder)\r\n+        embeddings = pixel_values \r\n+        \r\n+        # 2. Encoder (ViT-Large)\r\n+        hidden_states = embeddings\r\n+        features = []\r\n+        out_indices = [5, 11, 17, 23] # for DPT usage\r\n+        \r\n+        # Iterate over layers (assumed list in parameters)\r\n+        # Note: parameters object structure is crucial here\r\n+        for i in range(24): # Large has 24 layers\r\n+            layer_params = self.parameters.backbone.encoder.layer[i]\r\n+            hidden_states = vit_layer(hidden_states, layer_params)\r\n+            \r\n+            if i in out_indices:\r\n+                features.append(hidden_states)\r\n+        \r\n+        # 3. Neck (DPT Reassemble & Fusion)\r\n+        # Simplified: just passing features through\r\n+        \r\n+        # 4. Head\r\n+        depth = features[-1] # Stub\r\n+        \r\n+        return depth\r\n+\r\n+def custom_preprocessor(torch_model, name):\r\n+    # Convert PyTorch dictionary to ttnn.Model parameters\r\n+    # This function creates the 'parameters' object used in __init__\r\n+    \r\n+    import ttnn\r\n+    \r\n+    parameters = {}\r\n+    \r\n+    # Helper to convert a single weight\r\n+    def convert(tensor):\r\n+        return ttnn.from_torch(tensor, dtype=ttnn.bfloat16, layout=ttnn.TILE_LAYOUT)\r\n+    \r\n+    # 1. Backbone\r\n+    parameters[\"backbone\"] = {\"encoder\": {\"layer\": []}}\r\n+    \r\n+    # Encoder Layers\r\n+    for i, layer in enumerate(torch_model.backbone.encoder.layer):\r\n+        layer_params = {\r\n+            \"layernorm_before\": {\r\n+                \"weight\": convert(layer.norm1.weight),\r\n+                \"bias\": convert(layer.norm1.bias)\r\n+            },\r\n+            \"attention\": {\r\n+                \"query\": {\"weight\": convert(layer.attention.attention.query.weight), \"bias\": convert(layer.attention.attention.query.bias)},\r\n+                \"key\": {\"weight\": convert(layer.attention.attention.key.weight), \"bias\": convert(layer.attention.attention.key.bias)},\r\n+                \"value\": {\"weight\": convert(layer.attention.attention.value.weight), \"bias\": convert(layer.attention.attention.value.bias)},\r\n+                \"output\": {\"dense\": {\"weight\": convert(layer.attention.output.dense.weight), \"bias\": convert(layer.attention.output.dense.bias)}}\r\n+            },\r\n+            \"layernorm_after\": {\r\n+                \"weight\": convert(layer.norm2.weight),\r\n+                \"bias\": convert(layer.norm2.bias)\r\n+            },\r\n+            \"intermediate\": {\r\n+                \"dense\": {\"weight\": convert(layer.mlp.fc1.weight), \"bias\": convert(layer.mlp.fc1.bias)}\r\n+            },\r\n+            \"output\": {\r\n+                \"dense\": {\"weight\": convert(layer.mlp.fc2.weight), \"bias\": convert(layer.mlp.fc2.bias)}\r\n+            }\r\n+        }\r\n+        parameters[\"backbone\"][\"encoder\"][\"layer\"].append(layer_params)\r\n+\r\n+    # DPT Head (Neck + Head)\r\n+    # Stubbing for now to allow 'demo.py' to run without crashing on missing keys\r\n+    parameters[\"neck\"] = {}\r\n+    parameters[\"head\"] = {}\r\n+        \r\n+    return parameters\r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Missing validation for the custom_preprocessor return value structure. The parameters dictionary returned by custom_preprocessor is used directly in TtDepthAnythingV2.forward() to access nested attributes like self.parameters.backbone.encoder.layer[i], but there's no validation that the torch_model has the expected structure. If the model structure doesn't match expectations, this will fail with unclear error messages at runtime.",
+        "created_at": "2026-01-09T21:25:54Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666053",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666053"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666053"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666053/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": 222,
+        "original_start_line": 126,
+        "start_side": "RIGHT",
+        "line": 314,
+        "original_line": 172,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 172,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666061",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666061,
+        "node_id": "PRRC_kwDOI9Wqc86fmfEN",
+        "diff_hunk": "@@ -0,0 +1,30 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import pytest\r\n+import torch\r\n+import ttnn\r",
+        "path": "models/demos/depth_anything_v2/tests/test_model.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Unused imports in test file. The torch and ttnn imports on lines 5-6 are not used anywhere in the test. Remove unused imports to keep the code clean.\n```suggestion\n\n```",
+        "created_at": "2026-01-09T21:25:55Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666061",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666061"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666061"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666061/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": 1,
+        "original_start_line": 5,
+        "start_side": "RIGHT",
+        "line": 2,
+        "original_line": 6,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 6,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666070",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666070,
+        "node_id": "PRRC_kwDOI9Wqc86fmfEW",
+        "diff_hunk": "@@ -0,0 +1,70 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import torch.nn.functional as F\r\n+import numpy as np\r\n+import cv2\r\n+from PIL import Image\r\n+import transformers\r\n+\r\n+try:\r\n+    from transformers import AutoImageProcessor, AutoModelForDepthEstimation\r\n+except ImportError:\r\n+    print(\"Error: Could not import AutoImageProcessor or AutoModelForDepthEstimation from transformers.\")\r\n+    print(\"Please ensure you have a recent version of transformers installed.\")\r\n+    exit(1)\r\n+\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r\n+\r\n+def run_demo(\r\n+    model_id=\"depth-anything/Depth-Anything-V2-Large-hf\",\r\n+    image_path=\"models/demos/depth_anything_v2/demo/demo_image.jpg\"\r\n+):\r\n+    print(f\"Loading model: {model_id}\")\r\n+    \r\n+    # 1. Load PyTorch Model (Reference)\r\n+    try:\r\n+        torch_model = AutoModelForDepthEstimation.from_pretrained(model_id, torch_dtype=torch.float32, trust_remote_code=True)\r\n+        torch_model.eval()\r\n+        image_processor = AutoImageProcessor.from_pretrained(model_id, trust_remote_code=True)\r\n+        print(\"PyTorch model loaded successfully.\")\r\n+    except Exception as e:\r\n+        print(f\"Failed to load Hugging Face model: {e}\")\r\n+        return\r\n+\r\n+    # 2. Initialize Tenstorrent Device\r\n+    device = None\r\n+    try:\r\n+        device_id = 0\r\n+        device = ttnn.CreateDevice(device_id=device_id)\r\n+        print(f\"Device {device_id} opened.\")\r\n+    except Exception as e:\r\n+        print(f\"Warning: Failed to open Tenstorrent device (HW not present?): {e}\")\r\n+        print(\"Proceeding to verify model weight conversion on host...\")\r\n+\r\n+    # 3. Convert Weights & Initialize TT Model\r\n+    from models.demos.depth_anything_v2.tt.model_def import custom_preprocessor, TtDepthAnythingV2\r\n+    \r\n+    print(\"converting weights...\")\r\n+    parameters = custom_preprocessor(torch_model, \"depth_anything_v2\")\r\n+    \r\n+    # Needs a config object as expected by model_def.py\r\n+    # We can use the huggingface config directly as it has 'hidden_size', 'num_attention_heads' etc.\r\n+    tt_model = TtDepthAnythingV2(parameters)\r\n+    print(\"TT Model initialized.\")\r\n+\r\n+    # 4. Load & Preprocess Image\r\n+    # ...\r\n+    \r\n+    # 5. Run Inference\r\n+    # input_tensor = ...\r\n+    # output = tt_model(input_tensor)\r\n+    \r\n+    # Limit cleanup\r",
+        "path": "models/demos/depth_anything_v2/demo/demo.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The comment on line 35 has a typo. \"Limit cleanup\" should be \"Limited cleanup\" or \"Cleanup\" as it appears to be describing the cleanup section rather than an instruction to limit it.\n```suggestion\n    # Cleanup\n```",
+        "created_at": "2026-01-09T21:25:55Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666070",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666070"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666070"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666070/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 65,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 65,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666072",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666072,
+        "node_id": "PRRC_kwDOI9Wqc86fmfEY",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The classes TtDPTReassembleLayer, TtDPTFusionStage, and TtDPTHead inherit from torch.nn.Module but should inherit from a ttnn-specific base or not inherit at all since they're not using PyTorch's module functionality. These are meant to be ttnn implementations, not PyTorch modules. Consider removing the inheritance or using a more appropriate base class.",
+        "created_at": "2026-01-09T21:25:55Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666072",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666072"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666072"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666072/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 12,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 47,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 47,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666080",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666080,
+        "node_id": "PRRC_kwDOI9Wqc86fmfEg",
+        "diff_hunk": "@@ -0,0 +1,30 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import pytest\r\n+import torch\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r\n+\r\n+@pytest.mark.parametrize(\"device_params\", [{\"batch_size\": 1}], indirect=True)\r\n+def test_depth_anything_v2_initialization(device):\r",
+        "path": "models/demos/depth_anything_v2/tests/test_model.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The test function name test_depth_anything_v2_initialization is misleading. The test doesn't actually test initialization - it only checks that the class can be imported and is not None. Consider renaming to test_depth_anything_v2_class_import or implementing actual initialization testing.",
+        "created_at": "2026-01-09T21:25:55Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666080",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666080"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666080"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666080/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 10,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 10,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666085",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666085,
+        "node_id": "PRRC_kwDOI9Wqc86fmfEl",
+        "diff_hunk": "@@ -0,0 +1,30 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import pytest\r\n+import torch\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r\n+\r\n+@pytest.mark.parametrize(\"device_params\", [{\"batch_size\": 1}], indirect=True)\r\n+def test_depth_anything_v2_initialization(device):\r",
+        "path": "models/demos/depth_anything_v2/tests/test_model.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Unused test parameter. The test function declares a device parameter but never uses it. Either remove the device parameter from the function signature or implement actual device-based testing.\n```suggestion\ndef test_depth_anything_v2_initialization(device):\r\n    # Ensure the device fixture is initialized for this test\n    assert device is not None\n```",
+        "created_at": "2026-01-09T21:25:56Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666085",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666085"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666085"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666085/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 10,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 10,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666097",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666097,
+        "node_id": "PRRC_kwDOI9Wqc86fmfEx",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# ViT Backbone (Simplified Port)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+def vit_layer(hidden_states, parameters):\r\n+    # Layernorm 1\r\n+    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n+    \r\n+    # Self Attention (Simplified Matmuls)\r\n+    # Projections\r\n+    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n+    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n+    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n+    \r\n+    # Q * K\r\n+    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r\n+    attn = ttnn.softmax(attn, dim=-1)\r\n+    \r\n+    # Attn * V\r\n+    attn_out = attn @ v\r\n+    \r\n+    # Output dense\r\n+    attn_out = attn_out @ parameters.attention.output.dense.weight + parameters.attention.output.dense.bias\r\n+    \r\n+    # Residual 1\r\n+    hidden_states = hidden_states + attn_out\r\n+    \r\n+    # Layernorm 2\r\n+    ln2 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_after.weight, bias=parameters.layernorm_after.bias)\r\n+    \r\n+    # MLP\r\n+    mlp_out = ln2 @ parameters.intermediate.dense.weight + parameters.intermediate.dense.bias\r\n+    mlp_out = ttnn.gelu(mlp_out)\r\n+    mlp_out = mlp_out @ parameters.output.dense.weight + parameters.output.dense.bias\r\n+    \r\n+    # Residual 2\r\n+    hidden_states = hidden_states + mlp_out\r\n+    \r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The vit_layer function is missing essential tensor shape transformations required for proper attention computation. After the QKV projections on lines 60-62, the tensors need to be reshaped from (batch, seq, hidden_dim) to (batch, seq, num_heads, head_dim) before the permute operations. Additionally, layout conversions between TILE_LAYOUT and ROW_MAJOR_LAYOUT are needed for reshape operations. After attention computation, the output needs to be reshaped back and layout-converted. Reference implementations in models/demos/vit/tt/ttnn_functional_vit.py show these required transformations.\n```suggestion\n\n    # Determine shapes and attention head dimensions\n    batch_size, seq_len, hidden_dim = ttnn.get_shape(ln1)\n    num_heads = parameters.attention.num_heads\n    head_dim = hidden_dim // num_heads\n\n    # Self Attention - QKV projections\n    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n\n    # Convert to ROW_MAJOR for reshape operations\n    q = ttnn.to_layout(q, ttnn.ROW_MAJOR_LAYOUT)\n    k = ttnn.to_layout(k, ttnn.ROW_MAJOR_LAYOUT)\n    v = ttnn.to_layout(v, ttnn.ROW_MAJOR_LAYOUT)\n\n    # Reshape from (batch, seq, hidden_dim) -> (batch, seq, num_heads, head_dim)\n    q = ttnn.reshape(q, (batch_size, seq_len, num_heads, head_dim))\n    k = ttnn.reshape(k, (batch_size, seq_len, num_heads, head_dim))\n    v = ttnn.reshape(v, (batch_size, seq_len, num_heads, head_dim))\n\n    # Permute to (batch, num_heads, seq, head_dim)\n    q = ttnn.permute(q, (0, 2, 1, 3))\n    k = ttnn.permute(k, (0, 2, 1, 3))\n    v = ttnn.permute(v, (0, 2, 1, 3))\n\n    # Convert back to TILE layout for matmuls\n    q = ttnn.to_layout(q, ttnn.TILE_LAYOUT)\n    k = ttnn.to_layout(k, ttnn.TILE_LAYOUT)\n    v = ttnn.to_layout(v, ttnn.TILE_LAYOUT)\n\n    # Attention scores: (batch, num_heads, seq, seq)\n    attn_scores = q @ ttnn.permute(k, (0, 1, 3, 2))\n    attn_scores = attn_scores / math.sqrt(head_dim)\n    attn = ttnn.softmax(attn_scores, dim=-1)\n\n    # Attention output: (batch, num_heads, seq, head_dim)\n    attn_out = attn @ v\r\n\n    # Merge heads: (batch, num_heads, seq, head_dim) -> (batch, seq, hidden_dim)\n    attn_out = ttnn.to_layout(attn_out, ttnn.ROW_MAJOR_LAYOUT)\n    attn_out = ttnn.permute(attn_out, (0, 2, 1, 3))  # (batch, seq, num_heads, head_dim)\n    attn_out = ttnn.reshape(attn_out, (batch_size, seq_len, hidden_dim))\n    attn_out = ttnn.to_layout(attn_out, ttnn.TILE_LAYOUT)\n\n    # Output dense\r\n    attn_out = attn_out @ parameters.attention.output.dense.weight + parameters.attention.output.dense.bias\r\n\n    # Residual 1\r\n    hidden_states = hidden_states + attn_out\r\n\n    # Layernorm 2\r\n    ln2 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_after.weight, bias=parameters.layernorm_after.bias)\r\n\n    # MLP\r\n    mlp_out = ln2 @ parameters.intermediate.dense.weight + parameters.intermediate.dense.bias\r\n    mlp_out = ttnn.gelu(mlp_out)\r\n    mlp_out = mlp_out @ parameters.output.dense.weight + parameters.output.dense.bias\r\n\n    # Residual 2\r\n    hidden_states = hidden_states + mlp_out\r\n```",
+        "created_at": "2026-01-09T21:25:56Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666097",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666097"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666097"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666097/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": 119,
+        "original_start_line": 57,
+        "start_side": "RIGHT",
+        "line": 176,
+        "original_line": 87,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 87,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666111",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666111,
+        "node_id": "PRRC_kwDOI9Wqc86fmfE_",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# ViT Backbone (Simplified Port)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+def vit_layer(hidden_states, parameters):\r\n+    # Layernorm 1\r\n+    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n+    \r\n+    # Self Attention (Simplified Matmuls)\r\n+    # Projections\r\n+    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n+    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n+    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n+    \r\n+    # Q * K\r\n+    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "The attention scaling factor computation and softmax dimension are correct, but the scaling should happen before the softmax operation. Currently line 66 applies softmax with dim=-1 which is appropriate, but there's no attention scaling factor (1/sqrt(head_dim)) applied to the attention scores before the softmax. This scaling is critical for stable attention computation.\n```suggestion\n    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r\n    # Scaled dot-product attention: scale by 1/sqrt(head_dim) before softmax\n    head_dim = q.shape[-1]\n    scale = 1.0 / math.sqrt(head_dim)\n    attn = attn * scale\n```",
+        "created_at": "2026-01-09T21:25:56Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666111",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666111"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666111"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666111/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 65,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 65,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666129",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666129,
+        "node_id": "PRRC_kwDOI9Wqc86fmfFR",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# ViT Backbone (Simplified Port)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+def vit_layer(hidden_states, parameters):\r\n+    # Layernorm 1\r\n+    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n+    \r\n+    # Self Attention (Simplified Matmuls)\r\n+    # Projections\r\n+    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n+    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n+    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n+    \r\n+    # Q * K\r\n+    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r\n+    attn = ttnn.softmax(attn, dim=-1)\r\n+    \r\n+    # Attn * V\r\n+    attn_out = attn @ v\r\n+    \r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "27007b28de4ae49c3ae8b82542e79a9afb317748",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Missing context_layer reshape and permutation after attention computation. After the attention output on line 69 (attn @ v), the result needs to be permuted back to merge the heads, reshaped, and have layout conversions applied. The current code directly uses the attention output for the dense projection without these transformations, which will result in incorrect tensor dimensions.\n```suggestion\n    \r\n    # Merge heads back into the hidden dimension before output projection\n    attn_out = ttnn.permute(attn_out, (0, 2, 1, 3))\n    attn_out = ttnn.reshape(attn_out, (hidden_states.shape[0], hidden_states.shape[1], -1))\n    \n```",
+        "created_at": "2026-01-09T21:25:57Z",
+        "updated_at": "2026-01-09T21:26:02Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666129",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666129"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666129"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666129/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": 159,
+        "original_line": 70,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 70,
+        "position": 159,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666146",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666146,
+        "node_id": "PRRC_kwDOI9Wqc86fmfFi",
+        "diff_hunk": "@@ -0,0 +1,70 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import torch.nn.functional as F\r\n+import numpy as np\r\n+import cv2\r\n+from PIL import Image\r\n+import transformers\r\n+\r\n+try:\r\n+    from transformers import AutoImageProcessor, AutoModelForDepthEstimation\r\n+except ImportError:\r\n+    print(\"Error: Could not import AutoImageProcessor or AutoModelForDepthEstimation from transformers.\")\r\n+    print(\"Please ensure you have a recent version of transformers installed.\")\r\n+    exit(1)\r\n+\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r\n+\r\n+def run_demo(\r\n+    model_id=\"depth-anything/Depth-Anything-V2-Large-hf\",\r\n+    image_path=\"models/demos/depth_anything_v2/demo/demo_image.jpg\"\r\n+):\r\n+    print(f\"Loading model: {model_id}\")\r\n+    \r\n+    # 1. Load PyTorch Model (Reference)\r\n+    try:\r\n+        torch_model = AutoModelForDepthEstimation.from_pretrained(model_id, torch_dtype=torch.float32, trust_remote_code=True)\r\n+        torch_model.eval()\r\n+        image_processor = AutoImageProcessor.from_pretrained(model_id, trust_remote_code=True)\r",
+        "path": "models/demos/depth_anything_v2/demo/demo.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Variable image_processor is not used.\n```suggestion\n\n```",
+        "created_at": "2026-01-09T21:25:57Z",
+        "updated_at": "2026-01-09T21:26:03Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666146",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666146"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666146"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666146/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 31,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 31,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666158",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666158,
+        "node_id": "PRRC_kwDOI9Wqc86fmfFu",
+        "diff_hunk": "@@ -0,0 +1,70 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import torch.nn.functional as F\r\n+import numpy as np\r\n+import cv2\r\n+from PIL import Image\r\n+import transformers\r\n+\r\n+try:\r\n+    from transformers import AutoImageProcessor, AutoModelForDepthEstimation\r\n+except ImportError:\r\n+    print(\"Error: Could not import AutoImageProcessor or AutoModelForDepthEstimation from transformers.\")\r\n+    print(\"Please ensure you have a recent version of transformers installed.\")\r\n+    exit(1)\r\n+\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r\n+\r\n+def run_demo(\r\n+    model_id=\"depth-anything/Depth-Anything-V2-Large-hf\",\r\n+    image_path=\"models/demos/depth_anything_v2/demo/demo_image.jpg\"\r\n+):\r\n+    print(f\"Loading model: {model_id}\")\r\n+    \r\n+    # 1. Load PyTorch Model (Reference)\r\n+    try:\r\n+        torch_model = AutoModelForDepthEstimation.from_pretrained(model_id, torch_dtype=torch.float32, trust_remote_code=True)\r\n+        torch_model.eval()\r\n+        image_processor = AutoImageProcessor.from_pretrained(model_id, trust_remote_code=True)\r\n+        print(\"PyTorch model loaded successfully.\")\r\n+    except Exception as e:\r\n+        print(f\"Failed to load Hugging Face model: {e}\")\r\n+        return\r\n+\r\n+    # 2. Initialize Tenstorrent Device\r\n+    device = None\r\n+    try:\r\n+        device_id = 0\r\n+        device = ttnn.CreateDevice(device_id=device_id)\r\n+        print(f\"Device {device_id} opened.\")\r\n+    except Exception as e:\r\n+        print(f\"Warning: Failed to open Tenstorrent device (HW not present?): {e}\")\r\n+        print(\"Proceeding to verify model weight conversion on host...\")\r\n+\r\n+    # 3. Convert Weights & Initialize TT Model\r\n+    from models.demos.depth_anything_v2.tt.model_def import custom_preprocessor, TtDepthAnythingV2\r\n+    \r\n+    print(\"converting weights...\")\r\n+    parameters = custom_preprocessor(torch_model, \"depth_anything_v2\")\r\n+    \r\n+    # Needs a config object as expected by model_def.py\r\n+    # We can use the huggingface config directly as it has 'hidden_size', 'num_attention_heads' etc.\r\n+    tt_model = TtDepthAnythingV2(parameters)\r",
+        "path": "models/demos/depth_anything_v2/demo/demo.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Variable tt_model is not used.\n```suggestion\n    TtDepthAnythingV2(parameters)\n```",
+        "created_at": "2026-01-09T21:25:57Z",
+        "updated_at": "2026-01-09T21:26:03Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666158",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666158"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666158"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666158/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 55,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 55,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666165",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666165,
+        "node_id": "PRRC_kwDOI9Wqc86fmfF1",
+        "diff_hunk": "@@ -0,0 +1,30 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import pytest\r\n+import torch\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r\n+\r\n+@pytest.mark.parametrize(\"device_params\", [{\"batch_size\": 1}], indirect=True)\r\n+def test_depth_anything_v2_initialization(device):\r\n+    # Mock parameters using a simple Namespace or Dict\r\n+    # In a real test, verifying with state_dict loading is better\r\n+    \r\n+    class MockConfig:\r\n+        patch_size = 14\r\n+        num_attention_heads = 4\r\n+        \r\n+    config = MockConfig()\r",
+        "path": "models/demos/depth_anything_v2/tests/test_model.py",
+        "commit_id": "2eeb73393c088efc25f19809b22d828085bd9415",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Variable config is not used.\n```suggestion\n\n```",
+        "created_at": "2026-01-09T21:25:57Z",
+        "updated_at": "2026-01-09T21:26:03Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666165",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666165"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666165"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666165/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 17,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 18,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 18,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666173",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666173,
+        "node_id": "PRRC_kwDOI9Wqc86fmfF9",
+        "diff_hunk": "@@ -0,0 +1,70 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import torch.nn.functional as F\r\n+import numpy as np\r\n+import cv2\r\n+from PIL import Image\r\n+import transformers\r\n+\r\n+try:\r\n+    from transformers import AutoImageProcessor, AutoModelForDepthEstimation\r\n+except ImportError:\r\n+    print(\"Error: Could not import AutoImageProcessor or AutoModelForDepthEstimation from transformers.\")\r\n+    print(\"Please ensure you have a recent version of transformers installed.\")\r\n+    exit(1)\r\n+\r\n+import ttnn\r\n+from models.demos.depth_anything_v2.tt.model_def import TtDepthAnythingV2\r",
+        "path": "models/demos/depth_anything_v2/demo/demo.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "Import of 'TtDepthAnythingV2' is not used.\n```suggestion\n\n```",
+        "created_at": "2026-01-09T21:25:58Z",
+        "updated_at": "2026-01-09T21:26:03Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666173",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666173"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666173"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666173/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": null,
+        "start_side": null,
+        "line": null,
+        "original_line": 19,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 19,
+        "position": 1,
+        "subject_type": "line"
+    },
+    {
+        "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666178",
+        "pull_request_review_id": 3645617039,
+        "id": 2677666178,
+        "node_id": "PRRC_kwDOI9Wqc86fmfGC",
+        "diff_hunk": "@@ -0,0 +1,172 @@\n+# SPDX-FileCopyrightText: \u00a9 2024 Tenstorrent Inc.\r\n+# SPDX-License-Identifier: Apache-2.0\r\n+\r\n+import torch\r\n+import ttnn\r\n+import math\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# DPT Components (Neck & Head)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDPTReassembleLayer(torch.nn.Module):\r\n+    def __init__(self, config, parameters, read_idx):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        self.read_idx = read_idx\r\n+        # Simplified: We assume we just need to project. \r\n+        # Real implementation needs Upsample/Conv logic which might be complex in ttnn right now.\r\n+        # For this bounty stage (bring up), we maintain the structure.\r\n+\r\n+    def forward(self, hidden_state):\r\n+        # 1. Read (Slice CLS token if needed) - handled in backbone output\r\n+        # 2. Resample (Spatial manipulation) - Hardest part in ttnn\r\n+        # 3. Projection (Conv2d 1x1)\r\n+        \r\n+        # Stub: Just linear projection if possible or return as is for now\r\n+        return hidden_state\r\n+\r\n+class TtDPTFusionStage(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+    \r\n+    def forward(self, features):\r\n+        # Fusion logic: Add + Upsamle + Conv\r\n+        # Returning last feature for testing validity of graph\r\n+        return features[-1]\r\n+\r\n+class TtDPTHead(torch.nn.Module):\r\n+    def __init__(self, config, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, hidden_state):\r\n+        # Final Conv sequence\r\n+        # conv1 -> conv2 -> conv3\r\n+        return hidden_state\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# ViT Backbone (Simplified Port)\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+def vit_layer(hidden_states, parameters):\r\n+    # Layernorm 1\r\n+    ln1 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_before.weight, bias=parameters.layernorm_before.bias)\r\n+    \r\n+    # Self Attention (Simplified Matmuls)\r\n+    # Projections\r\n+    q = ln1 @ parameters.attention.query.weight + parameters.attention.query.bias\r\n+    k = ln1 @ parameters.attention.key.weight + parameters.attention.key.bias\r\n+    v = ln1 @ parameters.attention.value.weight + parameters.attention.value.bias\r\n+    \r\n+    # Q * K\r\n+    attn = q @ ttnn.permute(k, (0, 2, 1, 3)) # Placeholder dim\r\n+    attn = ttnn.softmax(attn, dim=-1)\r\n+    \r\n+    # Attn * V\r\n+    attn_out = attn @ v\r\n+    \r\n+    # Output dense\r\n+    attn_out = attn_out @ parameters.attention.output.dense.weight + parameters.attention.output.dense.bias\r\n+    \r\n+    # Residual 1\r\n+    hidden_states = hidden_states + attn_out\r\n+    \r\n+    # Layernorm 2\r\n+    ln2 = ttnn.layer_norm(hidden_states, weight=parameters.layernorm_after.weight, bias=parameters.layernorm_after.bias)\r\n+    \r\n+    # MLP\r\n+    mlp_out = ln2 @ parameters.intermediate.dense.weight + parameters.intermediate.dense.bias\r\n+    mlp_out = ttnn.gelu(mlp_out)\r\n+    mlp_out = mlp_out @ parameters.output.dense.weight + parameters.output.dense.bias\r\n+    \r\n+    # Residual 2\r\n+    hidden_states = hidden_states + mlp_out\r\n+    \r\n+    return hidden_states\r\n+\r\n+\r\n+# ----------------------------------------------------------------------------\r\n+# Main Model: Depth Anything V2\r\n+# ----------------------------------------------------------------------------\r\n+\r\n+class TtDepthAnythingV2(torch.nn.Module):\r\n+    def __init__(self, parameters):\r\n+        super().__init__()\r\n+        self.parameters = parameters\r\n+        \r\n+    def forward(self, pixel_values):\r\n+        # 1. Embeddings (Placeholder)\r\n+        embeddings = pixel_values \r\n+        \r\n+        # 2. Encoder (ViT-Large)\r\n+        hidden_states = embeddings\r\n+        features = []\r\n+        out_indices = [5, 11, 17, 23] # for DPT usage\r\n+        \r\n+        # Iterate over layers (assumed list in parameters)\r\n+        # Note: parameters object structure is crucial here\r\n+        for i in range(24): # Large has 24 layers\r\n+            layer_params = self.parameters.backbone.encoder.layer[i]\r\n+            hidden_states = vit_layer(hidden_states, layer_params)\r\n+            \r\n+            if i in out_indices:\r\n+                features.append(hidden_states)\r\n+        \r\n+        # 3. Neck (DPT Reassemble & Fusion)\r\n+        # Simplified: just passing features through\r\n+        \r\n+        # 4. Head\r\n+        depth = features[-1] # Stub\r\n+        \r\n+        return depth\r\n+\r\n+def custom_preprocessor(torch_model, name):\r\n+    # Convert PyTorch dictionary to ttnn.Model parameters\r\n+    # This function creates the 'parameters' object used in __init__\r\n+    \r\n+    import ttnn\r\n+    \r",
+        "path": "models/demos/depth_anything_v2/tt/model_def.py",
+        "commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "original_commit_id": "7d22ffe0d5f27ed59c8c60e8ebb494caccd9a859",
+        "user": {
+            "login": "Copilot",
+            "id": 175728472,
+            "node_id": "BOT_kgDOCnlnWA",
+            "avatar_url": "https://avatars.githubusercontent.com/in/946600?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/Copilot",
+            "html_url": "https://github.com/apps/copilot-pull-request-reviewer",
+            "followers_url": "https://api.github.com/users/Copilot/followers",
+            "following_url": "https://api.github.com/users/Copilot/following{/other_user}",
+            "gists_url": "https://api.github.com/users/Copilot/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/Copilot/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/Copilot/subscriptions",
+            "organizations_url": "https://api.github.com/users/Copilot/orgs",
+            "repos_url": "https://api.github.com/users/Copilot/repos",
+            "events_url": "https://api.github.com/users/Copilot/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/Copilot/received_events",
+            "type": "Bot",
+            "user_view_type": "public",
+            "site_admin": false
+        },
+        "body": "This import of module ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.demos.ufld_v2.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.experimental.openpdn_mnist.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.experimental.detr3d.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.demos.blackhole.ufld_v2.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.demos.wormhole.ufld_v2.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.demos.wormhole.bge_large_en.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.demos.wormhole.sentence_bert.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.demos.sentence_bert.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.demos.bge_large_en.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.demos.vgg_unet.ttnn is redundant, as it was previously imported [on line 5](1).\nThis import of module models.demos.blackhole.sentence_bert.ttnn is redundant, as it was previously imported [on line 5](1).\n```suggestion\n\n```",
+        "created_at": "2026-01-09T21:25:58Z",
+        "updated_at": "2026-01-09T21:26:03Z",
+        "html_url": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666178",
+        "pull_request_url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565",
+        "_links": {
+            "self": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666178"
+            },
+            "html": {
+                "href": "https://github.com/tenstorrent/tt-metal/pull/35565#discussion_r2677666178"
+            },
+            "pull_request": {
+                "href": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/35565"
+            }
+        },
+        "reactions": {
+            "url": "https://api.github.com/repos/tenstorrent/tt-metal/pulls/comments/2677666178/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+        },
+        "start_line": null,
+        "original_start_line": 130,
+        "start_side": "RIGHT",
+        "line": null,
+        "original_line": 131,
+        "side": "RIGHT",
+        "author_association": "CONTRIBUTOR",
+        "original_position": 131,
+        "position": 1,
+        "subject_type": "line"
+    }
+]

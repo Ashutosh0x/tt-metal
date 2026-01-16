@@ -60,14 +60,21 @@ class TtYolosModel(LightweightModule):
         """Setup patch embeddings and detection tokens"""
         if state_dict is not None and not self.args.dummy_weights:
             # Patch embedding projection
+            # In YOLOS, this is a Conv2d(3, 384, kernel_size=16, stride=16)
+            # We map it to a Linear layer for Stage 1 bring-up
             patch_weight = state_dict.get("vit.embeddings.patch_embeddings.projection.weight")
             patch_bias = state_dict.get("vit.embeddings.patch_embeddings.projection.bias")
             
-            # CLS token and detection tokens
+            # Reshape patch_weight from [384, 3, 16, 16] to [768, 384] (Transposed for linear)
+            if patch_weight is not None:
+                patch_weight = patch_weight.permute(2, 3, 1, 0).reshape(-1, self.args.hidden_size)
+            
+            # CLS token [1, 1, 384] and detection tokens [1, 100, 384]
             cls_token = state_dict.get("vit.embeddings.cls_token")
             det_tokens = state_dict.get("vit.embeddings.detection_tokens")
             
-            # Position embeddings
+            # Position embeddings [1, 1125, 384]
+            # 1 (CLS) + 100 (DET) + 1024 (PATCHES) = 1125
             pos_embed = state_dict.get("vit.embeddings.position_embeddings")
             
             self.patch_weight = self._to_ttnn(patch_weight, dtype)
@@ -92,13 +99,14 @@ class TtYolosModel(LightweightModule):
     def _setup_detection_heads(self, state_dict, dtype):
         """Setup class and bbox prediction heads"""
         if state_dict is not None and not self.args.dummy_weights:
-            # Class head (MLP)
+            # Class head (MLP: Linear(384, 384) -> ReLU -> Linear(384, 92))
+            # COCO has 91 classes + 1 for 'no object'
             cls_w1 = state_dict.get("class_labels_classifier.0.weight")
             cls_b1 = state_dict.get("class_labels_classifier.0.bias")
             cls_w2 = state_dict.get("class_labels_classifier.3.weight")
             cls_b2 = state_dict.get("class_labels_classifier.3.bias")
             
-            # BBox head (MLP)
+            # BBox head (MLP: Linear(384, 384) -> ReLU -> Linear(384, 384) -> ReLU -> Linear(384, 4) -> Sigmoid)
             box_w1 = state_dict.get("bbox_predictor.0.weight")
             box_b1 = state_dict.get("bbox_predictor.0.bias")
             box_w2 = state_dict.get("bbox_predictor.3.weight")
@@ -143,33 +151,37 @@ class TtYolosModel(LightweightModule):
         Forward pass.
         
         Args:
-            pixel_values: Input image [batch, channels, height, width]
+            pixel_values: Input patches or image. 
+                         Stage 1: [batch, num_patches, 768]
             
         Returns:
             Dict with 'logits' and 'pred_boxes'
         """
         batch_size = pixel_values.shape[0]
         
-        # Patch embedding (simplified - full implementation would use conv2d)
-        # For now, assume pre-processed patch embeddings
-        x = pixel_values  # [batch, num_patches + num_det_tokens + 1, hidden_size]
+        # 1. Patch projection
+        # [B, 1024, 768] -> [B, 1024, 384]
+        x = ttnn.linear(pixel_values, self.patch_weight, bias=self.patch_bias)
         
-        # Add position embeddings
+        # 2. Prepend CLS and DET tokens
+        # [1, 1, 384] and [1, 100, 384]
+        # In ttnn, we need to repeat tokens for batch_size if > 1
+        # For Stage 1, we assume batch_size=1
+        x = ttnn.concat([self.cls_token, self.det_tokens, x], dim=1)
+        
+        # 3. Add position embeddings [1, 1125, 384]
         if self.pos_embed is not None:
             x = ttnn.add(x, self.pos_embed)
         
-        # Encoder
+        # 4. Encoder
         for block in self.encoder_blocks:
             x = block.forward(x)
         
-        # Final LayerNorm
+        # 5. Final LayerNorm
         if self.final_ln_weight is not None:
             x = ttnn.layer_norm(x, weight=self.final_ln_weight, bias=self.final_ln_bias)
         
-        # Extract detection token outputs (last num_detection_tokens)
-        num_det = self.args.num_detection_tokens
-        # detection_output = x[:, -num_det:, :]  # [batch, 100, hidden_size]
-        
+        # 6. Detection heads (Class + BBox)
         # Class predictions
         if self.cls_w1 is not None:
             cls_hidden = ttnn.linear(x, self.cls_w1, bias=self.cls_b1)
@@ -189,6 +201,8 @@ class TtYolosModel(LightweightModule):
         else:
             pred_boxes = x
         
+        # Returns all outputs (CLS + DET + PATCHES)
+        # Usually DET tokens are at indices [1:101]
         return {
             "logits": logits,
             "pred_boxes": pred_boxes,

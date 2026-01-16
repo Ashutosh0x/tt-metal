@@ -62,18 +62,19 @@ class TtPhiModel(LightweightModule):
             layout=ttnn.TILE_LAYOUT,
         )
 
-    def forward(self, input_ids, cos, sin, mask=None):
+    def forward(self, input_ids, cos, sin, mask=None, layer_past=None, layer_past_len=0):
         # input_ids: [batch, seq_len]
         
         # Embedding
         x = ttnn.embedding(input_ids, self.embed_tokens)
         
-        # In ttnn, we might need to cast to TILE for subsequent layers
+        # Transform to TILE for subsequent layers
         x = ttnn.to_layout(x, ttnn.TILE_LAYOUT)
         
         # Layers
-        for layer in self.layers:
-            x = layer(x, cos, sin, mask)
+        for i, layer in enumerate(self.layers):
+            current_layer_past = layer_past[i] if layer_past is not None else None
+            x = layer(x, cos, sin, mask, current_layer_past, layer_past_len)
             
         # Final Norm
         x = ttnn.layer_norm(x, weight=self.final_layernorm_weight, bias=self.final_layernorm_bias)
@@ -97,3 +98,9 @@ def precompute_rope_phi(config, device):
     sin_tt = ttnn.from_torch(sin, device=device, dtype=ttnn.bfloat16, layout=ttnn.TILE_LAYOUT)
     
     return cos_tt, sin_tt
+
+
+def init_kv_cache(device, args, bsz, max_seq_len, dtype):
+    """Initialize KV cache for all layers"""
+    from models.demos.phi1_5.tt.kv_cache import TtPhiKVCache
+    return [TtPhiKVCache(device, args, bsz, max_seq_len, dtype) for _ in range(args.config.num_hidden_layers)]

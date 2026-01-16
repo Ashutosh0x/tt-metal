@@ -30,16 +30,12 @@ def test_yolos_small_inference(device):
         state_dict=state_dict,
     )
     
-    # Prepare dummy input
+    # Prepare dummy input (patched)
     batch_size = 1
-    image_size = args.image_size
-    # YOLOS expects pixel_values: [batch, 3, 512, 512]
-    # In our implementation, we'll need to handle the patch embedding
-    # For Stage 1, we can mock the input to the encoder
-    seq_len = args.num_patches + args.num_detection_tokens + 1 # +1 for CLS
-    hidden_size = args.hidden_size
+    num_patches = args.num_patches  # 1024
+    patch_dim = args.patch_size * args.patch_size * args.num_channels  # 16*16*3 = 768
     
-    input_torch = torch.randn(batch_size, seq_len, hidden_size)
+    input_torch = torch.randn(batch_size, num_patches, patch_dim)
     input_tt = ttnn.from_torch(
         input_torch,
         dtype=ttnn.bfloat16,
@@ -52,7 +48,10 @@ def test_yolos_small_inference(device):
     tt_output = tt_model.forward(input_tt)
     
     # Verify outputs
-    # Stage 1: Verify shapes and logic flow
+    # Logits: [1, 1125, 92] - CLS + 100 DET + 1024 PATCHES
+    # Pred Boxes: [1, 1125, 4]
+    seq_len = 1 + args.num_detection_tokens + args.num_patches # 1125
+    
     print(f"Logits shape: {tt_output['logits'].shape}")
     print(f"Boxes shape: {tt_output['pred_boxes'].shape}")
     

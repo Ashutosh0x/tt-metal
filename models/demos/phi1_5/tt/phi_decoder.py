@@ -38,14 +38,14 @@ class TtPhiDecoderLayer(LightweightModule):
         self.self_attn = TtPhiAttention(device, args, state_dict, layer_num, dtype)
         self.mlp = TtPhiMLP(device, args, state_dict, layer_num, dtype)
 
-    def forward(self, x, cos, sin, mask=None):
+    def forward(self, x, cos, sin, mask=None, layer_past=None, layer_past_len=0):
         residual = x
         
         # Norm
         norm_x = ttnn.layer_norm(x, weight=self.input_layernorm_weight, bias=self.input_layernorm_bias)
         
         # Parallel Attention and MLP
-        attn_out = self.self_attn(norm_x, cos, sin, mask)
+        attn_out = self.self_attn(norm_x, cos, sin, mask, layer_past, layer_past_len)
         mlp_out = self.mlp(norm_x)
         
         # x = residual + attn_out + mlp_out
