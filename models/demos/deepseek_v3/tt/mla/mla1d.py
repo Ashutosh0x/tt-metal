@@ -170,6 +170,7 @@ class MLA1D(AbstractModule):
         Returns:
             Dict containing operator configurations for prefill mode
         """
+
         grid_size = mesh_device.compute_with_storage_grid_size()
 
         # Extract dimensions from HF config
@@ -284,7 +285,7 @@ class MLA1D(AbstractModule):
         wkv_a_ag_config = AllGatherAsyncConfig(
             mesh_device=MeshDeviceStub(mesh_device.shape),
             cluster_axis=1,
-            dim=1,
+            dim=2,
             memory_config=ttnn.DRAM_MEMORY_CONFIG,
             topology=ttnn.Topology.Linear,
         )
@@ -348,6 +349,7 @@ class MLA1D(AbstractModule):
         Returns:
             Dict containing operator configurations for decode mode
         """
+
         grid_size = mesh_device.compute_with_storage_grid_size()
         num_cores = grid_size.x * grid_size.y
 
@@ -732,7 +734,6 @@ class MLA1D(AbstractModule):
         )
         if caches is None:
             caches = (torch.zeros(cache_shape),) * mesh_device.shape[0]
-
         # Store CCL object for runtime semaphore initialization
         return {
             MESH_DEVICE_STATE_DICT_KEY: mesh_device,
@@ -792,7 +793,6 @@ class MLA1D(AbstractModule):
         ccl = cfg["ccl"]
 
         bsz = x.shape[2]
-        scale = 1.0 / mla_tp_factor
 
         # wq_a and wq_b
         tt_q = ttnn.linear(x, **cfg["wq_a"])
@@ -839,9 +839,8 @@ class MLA1D(AbstractModule):
         tt_kv = ttnn.experimental.all_gather_async(
             tt_kv, **ccl.populate_all_gather_runtime_args(cfg["wkv_a_ag_decode"])
         )  # [1, num_devices, bsz, kv_lora_rank + qk_rope_head_dim]
-        tt_kv = ttnn.experimental.fast_reduce_nc(
-            tt_kv, **cfg["wkv_a_r_decode"]
-        )  # [1, 1, bsz, kv_lora_rank + qk_rope_head_dim]
+        # No reduction needed as kvpe is effectively replicated across the row
+
 
         tt_kv_nope = ttnn.slice(tt_kv, [0, 0, 0, 0], [1, 1, bsz, kv_lora_rank])
         tt_kv_rope = ttnn.slice(tt_kv, [0, 0, 0, kv_lora_rank], [1, 1, bsz, kv_lora_rank + qk_rope_head_dim])
@@ -874,7 +873,7 @@ class MLA1D(AbstractModule):
             tt_kvpe, **ccl.populate_reduce_scatter_runtime_args(cfg["wkv_a_rs_decode"])
         )
         tt_kvpe = tt_kvpe[:, :, :1, :]  # [1, bsz_local, 1, kv_lora_rank + qk_rope_head_dim]
-        tt_kvpe = tt_kvpe * scale  # Scale the input tensor
+        # Removed scaling workaround as redundant reduction above is removed
 
         tt_kvpe = ttnn.to_memory_config(tt_kvpe, **cfg["kvpe_reshard"])
         ttnn.deallocate(tt_kv_nope)
@@ -941,6 +940,7 @@ class MLA1D(AbstractModule):
         Returns:
             Output tensor after MLP computation
         """
+
         mesh_shape = cfg["mesh_shape"]
 
         sdpa_dp_factor = mla_tp_factor = mesh_shape[1]
@@ -995,10 +995,9 @@ class MLA1D(AbstractModule):
 
         tt_kv = ttnn.experimental.all_gather_async(
             tt_kv, **ccl.populate_all_gather_runtime_args(cfg["wkv_a_ag_prefill"])
-        )  # [1, 1, seq_len / num_devices, kv_lora_rank + qk_rope_head_dim]
-        tt_kv = ttnn.experimental.fast_reduce_nc(
-            tt_kv, **cfg["wkv_a_r_prefill"]
         )  # [1, 1, seq_len, kv_lora_rank + qk_rope_head_dim]
+        # No reduction needed as we all-gather across the sequence dimension directly
+
 
         tt_kv_nope = ttnn.slice(tt_kv, [0, 0, 0, 0], [1, 1, seq_len, kv_lora_rank])
         tt_kv_rope = ttnn.slice(tt_kv, [0, 0, 0, kv_lora_rank], [1, 1, seq_len, kv_lora_rank + qk_rope_head_dim])
@@ -1033,7 +1032,7 @@ class MLA1D(AbstractModule):
             tt_kvpe,
             page_table=page_table,
             batch_idx=local_batch_idx,
-            mesh_coords=set(get_mesh_coords(mesh_shape, row_idx, col_idx)),
+            mesh_coords=set(get_mesh_coords(mesh_shape, row_idx)),
         )
 
         # FlashMLA
